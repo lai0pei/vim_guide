@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vim Field Guide</title>
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0f1115">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%230f1115'/%3E%3Cpath d='M10 12 L20 29 L30 12' fill='none' stroke='%2357c96a' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='27' y='24' width='5' height='7' fill='%2357c96a'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%230f1115'/%3E%3Cpath d='M10 12 L20 29 L30 12' fill='none' stroke='%2357c96a' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='27' y='24' width='5' height='7' fill='%2357c96a'/%3E%3C/svg%3E">
+<meta name="description" content="A searchable reference to 606 Vim commands, compiled from the official help files, with before/after examples and links to the documentation.">
+<style>
+:root{
+  --bg:#0f1115; --bg2:#151922; --bg3:#1b202b; --line:#252c3a;
+  --fg:#d6dce6; --dim:#8b97ab; --key:#8ce99a; --accent:#57c96a;
+  --accent2:#63b3ed; --mark:#f0c674; --shadow:0 12px 40px rgba(0,0,0,.55);
+  --rowline:#1d2331;
+}
+:root[data-theme="light"]{
+  --bg:#f7f8fa; --bg2:#ffffff; --bg3:#eef1f6; --line:#d9dee8;
+  --fg:#1c2330; --dim:#5b6879; --key:#137a3a; --accent:#1f8f43;
+  --accent2:#1d6fb8; --mark:#a56f00; --shadow:0 10px 34px rgba(20,30,50,.16);
+  --rowline:#e8ecf3;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:15px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  -webkit-font-smoothing:antialiased}
+a{color:var(--accent2)}
+.wrap{max-width:none;margin:0;padding:0 18px}
+
+/* header */
+header{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:10px;padding:10px 0}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex-shrink:0}
+.brand{font-size:17px;font-weight:700;letter-spacing:.4px}
+.brand small{display:block;font-size:9.5px;font-weight:400;color:var(--dim);letter-spacing:1.4px;text-transform:uppercase}
+.search{position:relative;flex:1;max-width:400px;min-width:130px;margin-left:auto}
+.search input{width:100%;padding:8px 32px 8px 30px;border-radius:8px;border:1px solid var(--line);
+  background:var(--bg2);color:var(--fg);font:inherit;font-size:13.5px;outline:none;transition:border-color .18s,box-shadow .18s}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.search .ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:12.5px;pointer-events:none}
+.search kbd{position:absolute;right:7px;top:50%;transform:translateY(-50%)}
+kbd{background:var(--bg3);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;font-size:11px;color:var(--dim)}
+.tbtn{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--line);color:var(--fg);
+  border-radius:8px;padding:7px 11px;cursor:pointer;font:inherit;font-size:12px;white-space:nowrap;
+  transition:transform .15s,border-color .18s;flex-shrink:0}
+.tbtn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.tbtn i{font-style:normal;color:var(--accent);font-size:13px}
+.tbtn.icon{padding:7px 9px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg2);flex-shrink:0}
+.seg button{background:none;border:none;color:var(--dim);font:inherit;font-size:12px;padding:7px 11px;
+  cursor:pointer;transition:color .16s,background .16s;white-space:nowrap}
+.seg button:hover{color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--bg3);color:var(--accent)}
+.count{font-size:11.5px;color:var(--dim);white-space:nowrap}
+
+/* columns */
+.cols{display:grid;gap:0 18px;align-items:start;padding:16px 0 40px}
+.col{min-width:0}
+section{margin:0 0 14px;display:block;width:100%}
+.sh{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;padding:11px 14px;margin-bottom:3px;
+  background:color-mix(in srgb,var(--accent) 9%,var(--bg2));border:1px solid var(--line);
+  border-radius:8px;transition:border-color .18s,background .18s}
+.sh:hover{background:color-mix(in srgb,var(--accent) 16%,var(--bg2))}
+.sh h2{margin:0;font-size:16.5px;font-weight:700;letter-spacing:.2px;color:var(--fg)}
+.sh .n{margin-left:auto;font-size:11.5px;color:var(--accent);background:var(--bg);border:1px solid var(--line);
+  border-radius:99px;padding:1px 9px}
+.sh .caret{color:var(--dim);transition:transform .25s;font-size:11px}
+section.closed .sh .caret{transform:rotate(-90deg)}
+section.closed .body{display:none}
+.note{color:var(--dim);font-size:12.5px;padding:9px 13px 4px;font-style:italic;line-height:1.5}
+
+/* rows */
+.row{display:flex;justify-content:space-between;gap:10px;align-items:baseline;
+  padding:7px 13px;border-bottom:1px solid var(--rowline);cursor:pointer;position:relative}
+.row:last-child{border-bottom:none}
+.row:hover{background:var(--bg2)}
+.row .d{font-size:13.5px;line-height:1.5;display:flex;gap:7px;align-items:baseline;min-width:0;flex:1 1 auto}
+.row .d>span{overflow-wrap:anywhere}
+.row .cat{flex:0 0 auto;font-size:10.5px;color:var(--dim);border:1px solid var(--line);
+  border-radius:4px;padding:0 5px;white-space:nowrap;opacity:.8}
+.row .k{flex:0 0 auto;text-align:left;min-width:104px;color:var(--key);font-weight:600;font-size:13px;max-width:46%;
+  background:var(--bg3);border:1px solid var(--line);border-radius:5px;padding:2px 8px;
+  overflow-wrap:normal;word-break:keep-all;white-space:nowrap;transition:border-color .15s,color .15s}
+.row .k.long{white-space:normal}
+.row:hover .k{border-color:var(--accent);color:var(--accent)}
+.doc{flex:0 0 auto;font-size:11px;color:var(--dim);text-decoration:none;border:1px solid var(--line);
+  border-radius:4px;padding:0 5px;opacity:.55;transition:opacity .15s,color .15s,border-color .15s;align-self:center}
+.row:hover .doc{opacity:1}
+.doc:hover{color:var(--accent);border-color:var(--accent)}
+.pin{flex:0 0 auto;font-style:normal;color:var(--accent);opacity:.45;font-size:12px;padding:0 3px;
+  border-radius:4px;transition:opacity .15s,background .15s;align-self:center}
+.row:hover .pin{opacity:.9}
+.pin:hover{background:var(--bg3);opacity:1}
+.row.open .pin{opacity:1;transform:rotate(90deg)}
+.idemo{display:none;padding:9px 13px 12px 16px;border-bottom:1px solid var(--rowline);background:color-mix(in srgb,var(--bg2) 70%,transparent)}
+.row.open+.idemo{display:block;animation:fadein .18s ease both}
+@keyframes fadein{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.idemo .pair{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.idemo pre{flex:1 1 170px;margin:0;padding:5px 8px;background:var(--bg3);border:1px solid var(--line);
+  border-radius:5px;font:12.5px/1.65 inherit;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--fg);min-width:0}
+.idemo pre mark{background:color-mix(in srgb,var(--accent) 30%,transparent);color:inherit;border-radius:2px;padding:0 1px}
+.idemo .ar{flex:0 0 auto;color:var(--accent);font-size:11px;opacity:.7}
+.idemo .cap{font-size:12px;color:var(--dim);font-style:italic;margin-top:5px;line-height:1.5}
+.idemo .cur{display:inline-block;width:2px;height:12px;background:var(--accent);vertical-align:-2px;margin:0 -1px;
+  animation:blink 1.1s step-end infinite}
+.row mark{background:color-mix(in srgb,var(--mark) 35%,transparent);color:inherit;border-radius:2px;padding:0 1px}
+.empty{padding:40px 12px;text-align:center;color:var(--dim)}
+
+/* demo card */
+#dcard{position:fixed;z-index:200;width:392px;max-width:calc(100vw - 24px);background:var(--bg2);
+  border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:11px 13px 12px;
+  opacity:0;transform:translateY(5px);pointer-events:none;transition:opacity .16s ease,transform .16s ease}
+#dcard.on{opacity:1;transform:none}
+#dcard .dk{font-size:12.5px;color:var(--accent);font-weight:700;margin-bottom:9px;display:flex;gap:10px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding-bottom:7px}
+#dcard .pane{margin-bottom:7px}
+#dcard .tag{font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:3px}
+#dcard pre{margin:0;padding:8px 10px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;
+  font:12.5px/1.7 inherit;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--fg)}
+#dcard pre mark{background:color-mix(in srgb,var(--accent) 30%,transparent);color:inherit;border-radius:2px;padding:0 1px}
+#dcard .cur{display:inline-block;width:2px;height:13px;background:var(--accent);vertical-align:-2px;
+  margin:0 -1px;animation:blink 1.1s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+#dcard .arrow{color:var(--dim);font-size:11px;text-align:center;margin:-2px 0 4px}
+#dcard .dk small{margin-left:auto;font-size:10.5px;color:var(--dim);font-weight:400;font-style:normal}
+#dcard .cap{font-size:11.5px;color:var(--dim);line-height:1.55;margin-top:8px;font-style:italic}
+
+.top{position:fixed;right:16px;bottom:16px;width:38px;height:38px;border-radius:50%;background:var(--bg2);
+  border:1px solid var(--line);color:var(--fg);cursor:pointer;display:grid;place-items:center;opacity:0;
+  transform:translateY(10px);transition:opacity .25s,transform .25s,border-color .2s;box-shadow:var(--shadow);z-index:70}
+.top.show{opacity:1;transform:none}
+.top:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:700px){
+  .cols{columns:1;padding-top:12px}
+  .row{flex-direction:column;align-items:flex-start;gap:3px;padding:9px 13px}
+  .row .k{max-width:100%;min-width:0;margin-left:0}
+  .row .d{min-width:0;margin-left:2px}
+  .bar{flex-wrap:wrap;gap:8px}
+  .search{order:9;flex-basis:100%;max-width:none;margin-left:0}
+  .count{order:10}
+  #dcard{width:calc(100vw - 24px)}
+}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  :root{--bg:#fff;--bg2:#fff;--bg3:#f4f6f9;--fg:#111;--dim:#555;--line:#bbb;--rowline:#ddd;--key:#0a5c2c;--accent:#0a5c2c}
+  header,.top,#dcard,.doc,.pin{display:none!important}
+  .cols{display:block!important;columns:2;column-gap:20px}
+  section{break-inside:avoid}
+  .idemo{display:none!important}
+  body{font-size:10pt}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="wrap">
+  <div class="bar">
+    <a class="logo" href="#top">
+      <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent2)"/></linearGradient></defs>
+        <rect x="1.5" y="1.5" width="37" height="37" rx="9" fill="none" stroke="url(#g)" stroke-width="2.2"/>
+        <path d="M10 12 L20 29 L30 12" fill="none" stroke="url(#g)" stroke-width="3.4" stroke-linecap="round"
+              stroke-linejoin="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100">
+          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="1.1s" fill="freeze"
+                   calcMode="spline" keySplines="0.3 0 0.2 1" keyTimes="0;1"/></path>
+        <rect x="27" y="24" width="5" height="7" fill="var(--accent)">
+          <animate attributeName="opacity" values="1;1;0;0;1" dur="1.2s" repeatCount="indefinite" begin="1.1s"/></rect>
+      </svg>
+      <span class="brand">Vim Field Guide<small>Command reference</small></span>
+    </a>
+    <div class="seg" role="group" aria-label="Group by">
+      <button id="gf" aria-pressed="true">By function</button>
+      <button id="gt" aria-pressed="false">By frequency</button>
+    </div>
+    <div class="search">
+      <span class="ic">/</span>
+      <input id="q" type="search" aria-label="Search commands" placeholder="Search commands and descriptions" autocomplete="off" spellcheck="false">
+      <kbd>/</kbd>
+    </div>
+    <span class="count" id="count"></span>
+    <button class="tbtn" id="expand"><i>⇕</i><span id="expand-t">collapse all</span></button>
+    <button class="tbtn icon" id="theme" title="Light / dark theme"><i>◐</i></button>
+  </div>
+ </div>
+</header>
+
+<main class="wrap" id="top"><div class="cols" id="out"></div></main>
+
+<button class="top" id="top-btn" title="Back to top">↑</button>
+<div id="dcard" aria-hidden="true"></div>
+
+<script>
+const SECTIONS = [
+{id:'survival',title:'Modes & Core Commands',icon:'◈',note:'Mode changes, writing and quitting, and the two commands on which undo and repeat depend.',items:[
+['Esc','Back to Normal mode (the home base)','essential','insert.txt#i_<Esc>'],
+['<C-[>','Same as Esc, easier to reach','daily','insert.txt#i_CTRL-['],
+['i / a','Insert before / after cursor','essential','insert.txt'],
+['I / A','Insert at first non-blank / end of line','essential','insert.txt#I'],
+['o / O','Open new line below / above and insert','essential','insert.txt#o'],
+['v / V / <C-v>','Visual char / line / block mode','essential','visual.txt#v'],
+['R','Replace mode (overtype)','daily','change.txt#R'],
+['gi','Insert exactly where you last left insert mode','daily','insert.txt#gi'],
+[':w / :q / :wq / :q!','Write / quit / write+quit / quit discarding','essential','editing.txt#:wq'],
+['ZZ / ZQ','Write+quit / quit without saving','essential','editing.txt#ZZ'],
+[':w !sudo tee %','Write a root-owned file opened without sudo','daily','editing.txt#:w_c'],
+['u / <C-r>','Undo / redo','essential','undo.txt'],
+['.','Repeat the last change','essential','repeat.txt#.'],
+[':h <topic>','Open help. <C-]> follows a link, <C-o> goes back','essential','helphelp.txt#:help'],
+[':h index','Every command in every mode, in one file','rare','index.txt#index'],
+['<C-c>','Abort a command / interrupt a running search','daily','pattern.txt#CTRL-C'],
+['<C-g>','Show file name, position and status','daily','editing.txt#CTRL-G'],
+['g<C-g>','Word, line, character and byte count for the file or selection','rare','editing.txt#g_CTRL-G']
+]},
+
+{id:'motion',title:'Motions',icon:'➜',note:'Every motion also serves as an operator target: d, c or y followed by the motion.',items:[
+['h j k l','Left, down, up, right','essential','motion.txt#h'],
+['w / W','Next word start / WORD start (WORD = space-separated)','essential','motion.txt#w'],
+['e / E','Next word end / WORD end','essential','motion.txt#e'],
+['b / B','Previous word start / WORD start','essential','motion.txt#b'],
+['ge / gE','Previous word end','rare','motion.txt#ge'],
+['0 / ^ / $','Line start / first non-blank / line end','essential','motion.txt#0'],
+['g_','Last non-blank character of the line','rare','motion.txt#g_'],
+['g0 / g$','Start / end of the screen line (wrapped text)','rare','motion.txt#g0'],
+['gj / gk','Down / up by screen line, not by real line','daily','motion.txt#gj'],
+['f{c} / F{c}','Jump to next / previous {c} on this line','essential','motion.txt#f'],
+['t{c} / T{c}','Jump just before next / after previous {c}','essential','motion.txt#t'],
+[';  /  ,','Repeat last f/t forward / backward','essential','motion.txt#;'],
+['gg / G','First line / last line','essential','motion.txt#gg'],
+['{n}G  or  :{n}','Go to line n','essential','motion.txt#G'],
+['{n}%','Go to n percent through the file','rare','motion.txt#N%'],
+['H / M / L','Top / middle / bottom of the visible screen','daily','motion.txt#H'],
+['{ / }','Previous / next blank-line paragraph','essential','motion.txt#{'],
+['( / )','Previous / next sentence','rare','motion.txt#('],
+['[[ / ]]','Previous / next section or function start (col-1 \'{\')','daily','motion.txt#[['],
+['[{ / ]}','Jump to the enclosing { or }','daily','motion.txt#[{'],
+['[( / ])','Jump to the enclosing ( or )','rare','motion.txt#[('],
+['[m / ]m','Previous / next method start (Java-like languages)','rare','motion.txt#[m'],
+['%','Jump to matching bracket, and with matchit to matching tag/keyword','essential','motion.txt#%'],
+['*  /  #','Search forward / backward for the word under the cursor','essential','pattern.txt#star'],
+['g* / g#','Same, but match as substring (no word boundaries)','rare','pattern.txt#gstar'],
+['<C-o> / <C-i>','Jump back / forward through the jump list','essential','motion.txt#CTRL-O'],
+['``  /  \'\'','Back to position / line before the last jump','daily','motion.txt#``'],
+['`.  /  \'.','Jump to the position of the last change','daily','motion.txt#`.'],
+['g;  /  g,','Older / newer position in the change list','daily','motion.txt#g;'],
+['zz / zt / zb','Redraw with cursor line centered / at top / at bottom','essential','scroll.txt#zz'],
+['<C-e> / <C-y>','Scroll one line down / up without moving cursor','daily','scroll.txt#CTRL-E'],
+['<C-d> / <C-u>','Scroll half a page down / up','essential','scroll.txt#CTRL-D'],
+['<C-f> / <C-b>','Page forward / back','essential','scroll.txt#CTRL-F'],
+['zh / zl','Scroll sideways one char (nowrap)','rare','scroll.txt#zh'],
+['zs / ze','Scroll so cursor is at screen start / end','rare','scroll.txt#zs'],
+['|','Go to column 1; {n}| goes to column n','rare','motion.txt#bar'],
+['_','First non-blank, n lines down','rare','motion.txt#_'],
+['+ / -','First non-blank of next / previous line','rare','motion.txt#+'],
+['gm','Half a screen width right on the screen line','rare','motion.txt#gm'],
+['go','Go to byte n in the buffer','rare','motion.txt#go'],
+['gd / gD','Go to local / global declaration of the word under cursor','daily','pattern.txt#gd'],
+[']s / [s','Next / previous misspelled word','rare','spell.txt#]s'],
+['<C-]>','Jump to the tag (definition) under the cursor','essential','tagsrch.txt#CTRL-]']
+]},
+
+{id:'objects',title:'Text Objects',icon:'▣',note:'Used after an operator (d, c, y) or in Visual mode. i selects the contents, a includes the delimiters.',items:[
+['iw / aw','Inner word / a word plus trailing space','essential','motion.txt#v_iw'],
+['iW / aW','Inner WORD / a WORD (space-separated)','daily','motion.txt#v_iW'],
+['is / as','Inner / a sentence','rare','motion.txt#v_is'],
+['ip / ap','Inner / a paragraph','essential','motion.txt#v_ip'],
+['i" / a"','Inside / around double quotes','essential','motion.txt#v_iquote'],
+['i\' / a\'','Inside / around single quotes','daily','motion.txt#v_iquote'],
+['i` / a`','Inside / around backticks','rare','motion.txt#v_iquote'],
+['i( i) ib','Inside parentheses','essential','motion.txt#v_ib'],
+['a( a) ab','Around parentheses (includes them)','essential','motion.txt#v_ab'],
+['i{ i} iB','Inside curly braces','essential','motion.txt#v_iB'],
+['a{ a} aB','Around curly braces','essential','motion.txt#v_aB'],
+['i[ i]  /  a[ a]','Inside / around square brackets','daily','motion.txt#v_i['],
+['i< i>  /  a< a>','Inside / around angle brackets','rare','motion.txt#v_i<'],
+['it / at','Inside / around an XML/HTML tag pair','daily','motion.txt#v_it'],
+['ci"','Change the text inside the quotes','essential','motion.txt#v_iquote'],
+['di(','Delete inside the parens, keep the parens','essential','motion.txt#v_ib'],
+['ya{','Yank the whole brace block including braces','rare','motion.txt#v_aB'],
+['dap','Delete a paragraph plus its trailing blank line','daily','motion.txt#v_ap'],
+['cit','Replace the contents of an HTML tag','daily','motion.txt#v_it'],
+['vi{V','Select brace contents, then extend to whole lines','rare','motion.txt#v_iB'],
+['2i{ / 2a{','Count works: the second enclosing block outwards','rare','motion.txt#v_iB'],
+['gn','Select the next search match — then c/d/y it, repeat with .','daily','visual.txt#gn'],
+['gN','Same, backwards','rare','visual.txt#gN']
+]},
+
+{id:'edit',title:'Operators & Changes',icon:'✎',note:'Syntax: {count}{operator}{motion or text object}. Doubling the operator applies it to the whole line.',items:[
+['x / X','Delete char under / before cursor','essential','change.txt#x'],
+['d{motion}','Delete over the motion','essential','change.txt#d'],
+['dd / D','Delete line / delete to end of line','essential','change.txt#dd'],
+['c{motion}','Change (delete and enter insert)','essential','change.txt#c'],
+['cc / C','Change whole line / to end of line','essential','change.txt#cc'],
+['s / S','Substitute char / whole line','essential','change.txt#s'],
+['y{motion} / yy / Y','Yank (copy) motion / line','essential','change.txt#yy'],
+['p / P','Put after / before cursor (linewise if yanked linewise)','essential','change.txt#p'],
+['gp / gP','Put and leave cursor after the pasted text','rare','change.txt#gp'],
+[']p','Put linewise, adjusting indent to the current line','rare','change.txt#]p'],
+['r{c} / gr{c}','Replace one char without entering insert mode','essential','change.txt#r'],
+['~','Toggle case of the character under the cursor','rare','change.txt#~'],
+['g~{motion} / g~~','Toggle case over motion / line','rare','change.txt#g~'],
+['gu{motion} / gU{motion}','Lowercase / uppercase over motion','daily','change.txt#gu'],
+['gUiw','Uppercase the current word','daily','change.txt#gU'],
+['J / gJ','Join line below, with / without inserting a space','essential','change.txt#J'],
+['<C-a> / <C-x>','Increment / decrement the number under the cursor','essential','change.txt#CTRL-A'],
+['g<C-a>','In Visual block: make an incrementing number sequence','rare','change.txt#v_g_CTRL-A'],
+['>> / <<','Indent / dedent line by one shiftwidth','essential','change.txt#>>'],
+['>{motion} / >ip','Indent over a motion or text object','daily','change.txt#>'],
+['={motion} / ==','Re-indent using the file\'s indent rules','essential','change.txt#='],
+['gg=G','Re-indent the entire file','daily','change.txt#='],
+['gq{motion} / gqq','Reformat text to textwidth','daily','change.txt#gq'],
+['gqip','Rewrap the current paragraph','daily','change.txt#gq'],
+['gw{motion}','Reformat but keep the cursor where it is','rare','change.txt#gw'],
+['guu / gUU','Lowercase / uppercase the whole line','rare','change.txt#gugu'],
+['g?{motion}','Apply ROT13 to the text','rare','change.txt#g?'],
+['dw / de / d$ / d0','Delete word / to word end / to line end / to line start','essential','change.txt#d'],
+['d/foo<CR>','Delete from cursor up to the next \'foo\'','essential','change.txt#d'],
+['dt) / df)','Delete up to / including the next )','essential','change.txt#d'],
+['3dd / d3j','Delete 3 lines / this line plus 3 below','essential','change.txt#dd'],
+['ddp / ddkP','Move the current line down / up by one','daily','change.txt#dd'],
+['xp','Transpose two characters','rare','change.txt#x'],
+['yiwviwp','Replace a word with the yanked word (clobbers register)','rare','change.txt#v_p'],
+['"0p','Paste the last yank even after you deleted something','daily','change.txt#quote0'],
+['&  /  g&','Repeat last :s on this line / on the whole file','daily','change.txt#&'],
+['ga','Show the character code under the cursor (dec/hex/octal)','rare','various.txt#ga'],
+['g8','Show the UTF-8 bytes of the character under the cursor','rare','various.txt#g8'],
+['gv','Reselect the last visual selection','essential','visual.txt#gv'],
+['<C-o> in insert','Run one Normal-mode command then return to insert','daily','insert.txt#i_CTRL-O'],
+[':m +1  /  :m -2','Move the current line down / up','daily','change.txt#:move'],
+[':t . / :co .','Copy (duplicate) a line to the current position','daily','change.txt#:copy'],
+[':normal! @q','Run a macro as an Ex command over a range','rare','various.txt#:normal']
+]},
+
+{id:'registers',title:'Registers & Clipboard',icon:'▤',note:'Prefix any yank, delete or put with "x to use register x.',items:[
+[':reg  /  :di','Show the contents of every register','daily','change.txt#:registers'],
+['"ayy / "ap','Yank into register a / paste from it','daily','change.txt#registers'],
+['"Ayy','Append to register a (capital = append)','rare','change.txt#quote_alpha'],
+['"0','Yank register — holds only the last yank, never deletes','daily','change.txt#quote0'],
+['"1 … "9','Shift register: last 9 deletes, most recent first','rare','change.txt#quote_number'],
+['"-','Small delete register (less than one line)','rare','change.txt#quote_-'],
+['"+  /  "*','System clipboard / X11 primary selection','daily','gui_x11.txt#quoteplus'],
+['"+y / "+p','Copy to / paste from the system clipboard','essential','gui_x11.txt#quoteplus'],
+['"%','Current file name','rare','change.txt#quote_%'],
+['"#','Alternate file name','rare','change.txt#quote_#'],
+['".','The text you last inserted','rare','change.txt#quote_.'],
+['":','The last Ex command you ran','rare','change.txt#quote_:'],
+['"/','The last search pattern','rare','change.txt#quote_/'],
+['"_dd','Delete into the black hole — does not touch any register','daily','change.txt#quote_'],
+['<C-r>a  (insert)','Paste register a while in insert mode','daily','insert.txt#i_CTRL-R'],
+['<C-r><C-p>a','Paste register a literally, fixing indent','rare','insert.txt#i_CTRL-R_CTRL-P'],
+['<C-r>=5*12<CR>','Insert the result of an expression','daily','insert.txt#i_CTRL-R'],
+[':let @a = @b','Copy register b into register a','rare','eval.txt#:let-register'],
+[':let @+ = expand("%:p")','Put the full file path on the clipboard','rare','eval.txt#:let-register'],
+['q:  /  q/','Open the command / search history as an editable window','daily','cmdline.txt#q:']
+]},
+
+{id:'search',title:'Search & Replace',icon:'⌕',note:'Vim patterns. \\v (very magic) gives a syntax close to Perl and PCRE.',items:[
+['/pattern  ?pattern','Search forward / backward','essential','pattern.txt#/'],
+['n / N','Next / previous match (same / opposite direction)','essential','pattern.txt#n'],
+['/pat/e','Put the cursor at the end of the match','rare','pattern.txt#search-offset'],
+['/pat/+2','Land 2 lines below the match','rare','pattern.txt#search-offset'],
+['//','Repeat the previous search','daily','pattern.txt#last-pattern'],
+['<C-r><C-w> in search','Insert the word under the cursor into the search line','daily','cmdline.txt#c_CTRL-R_CTRL-W'],
+[':noh','Clear the search highlighting until next search','essential','pattern.txt#:nohlsearch'],
+[':set hlsearch incsearch ignorecase smartcase','The four search options most configurations set','daily','options.txt#\'hlsearch\''],
+['\\v','Very magic: ( ) | + ? all work without backslashes','daily','pattern.txt#/\\v'],
+['\\V','Very nomagic: almost everything is literal','rare','pattern.txt#/\\V'],
+['\\c / \\C','Force case-insensitive / case-sensitive for this search','daily','pattern.txt#/\\c'],
+['\\<word\\>','Whole-word match','daily','pattern.txt#/\\<'],
+['\\zs / \\ze','Set where the match actually starts / ends','rare','pattern.txt#/\\zs'],
+['\\{n,m}','Repeat n to m times','daily','pattern.txt#/\\{'],
+['\\(...\\)  →  \\1','Capture group and backreference','daily','pattern.txt#/\\('],
+['%(...)','Non-capturing group (with \\v)','rare','pattern.txt#/\\%(\\)'],
+['\\_s / \\_.','Whitespace / any char, including newlines','rare','pattern.txt#/\\_'],
+['[[:alpha:]] [[:digit:]]','POSIX character classes','rare','pattern.txt#[:alpha:]'],
+['\\@= \\@! \\@<= \\@<!','Lookahead / negative lookahead / lookbehind / negative','rare','pattern.txt#/\\@='],
+[':s/old/new/','Replace first match on the current line','essential','change.txt#:s'],
+[':s/old/new/g','Replace all matches on the line','essential','change.txt#:s_flags'],
+[':%s/old/new/g','Replace throughout the file','essential','change.txt#:s'],
+[':%s/old/new/gc','…asking for confirmation on each one','essential','change.txt#:s_c'],
+[':%s/old/new/gi','…ignoring case','daily','change.txt#:s_i'],
+[':5,20s/old/new/g','Only within lines 5–20','daily','cmdline.txt#cmdline-ranges'],
+[':\'<,\'>s/old/new/g','Only within the visual selection','daily','cmdline.txt#v_:'],
+[':%s//new/g','Reuse the last search pattern as the target','daily','change.txt#:s'],
+[':%s/\\v(\\w+) (\\w+)/\\2 \\1/','Swap two words using capture groups','rare','change.txt#sub-replace-special'],
+[':%s/x/\\=submatch(0)+1/g','Replace with the result of an expression','rare','change.txt#sub-replace-expression'],
+[':%s/foo/bar/gn','Count matches without changing anything','daily','change.txt#:s_n'],
+[':%s/\\s\\+$//e','Strip trailing whitespace from the file','daily','change.txt#:s_e'],
+[':sort  /  :sort!  /  :sort u','Sort lines / reverse / sort and remove duplicates','daily','change.txt#:sort'],
+[':sort n  /  :sort /pat/','Numeric sort / sort by what follows the pattern','daily','change.txt#:sort'],
+[':%!sort -u','Same thing, via an external command','daily','change.txt#:range!']
+]},
+
+{id:'global',title:'Ranges, :global & :normal',icon:'⚡',note:'Applying a command to every line matching a pattern, and to explicit line ranges.',items:[
+[':g/pat/d','Delete every line matching the pattern','daily','repeat.txt#:global'],
+[':v/pat/d   (or :g!)','Delete every line NOT matching — keep only matches','daily','repeat.txt#:vglobal'],
+[':g/pat/normal! A;','Append a semicolon to every matching line','daily','various.txt#:normal'],
+[':g/pat/t$','Copy all matching lines to the end of the file','rare','change.txt#:copy'],
+[':g/pat/m0','Move matching lines to the top (reverses their order)','rare','change.txt#:move'],
+[':g/^$/d','Remove all blank lines','daily','repeat.txt#:global'],
+[':g/pat/ .,+3d','Delete each match plus the 3 lines after it','rare','repeat.txt#:global'],
+[':g/pat/s/a/b/g','Run a substitution only on matching lines','daily','repeat.txt#:global'],
+[':g/pat/y A','Collect every matching line into register a','rare','change.txt#:yank'],
+[':%normal! I# ','Comment out every line in the file','daily','various.txt#:normal'],
+[':\'<,\'>normal! @q','Run macro q on every selected line','daily','various.txt#:normal'],
+[':.,+5','Range: current line to 5 lines down','daily','cmdline.txt#cmdline-ranges'],
+[':1,$   or  :%','Whole file','daily','cmdline.txt#cmdline-ranges'],
+[':.,$','Cursor line to end of file','daily','cmdline.txt#cmdline-ranges'],
+[':\'a,\'b','From mark a to mark b','rare','cmdline.txt#cmdline-ranges'],
+[':/start/,/end/','From the next \'start\' line to the next \'end\' line','rare','cmdline.txt#cmdline-ranges'],
+[':g/pat/z#.5','Print each match with 5 lines of context and line numbers','rare','various.txt#:z'],
+[':%!python3 -m json.tool','Filter the whole buffer through an external program','daily','change.txt#:range!'],
+[':.!date','Replace the current line with the output of a command','daily','change.txt#:range!'],
+[':r !ls -la','Read a command\'s output into the buffer','daily','insert.txt#:read!'],
+[':r file.txt','Read a file in below the cursor','daily','insert.txt#:read'],
+[':w >> other.txt','Append the buffer to another file','rare','editing.txt#:w_a']
+]},
+
+{id:'insert',title:'Insert Mode',icon:'⌨',note:'Editing, completion and register access without leaving Insert mode.',items:[
+['<C-w>','Delete the word before the cursor','essential','insert.txt#i_CTRL-W'],
+['<C-u>','Delete everything before the cursor on this line','essential','insert.txt#i_CTRL-U'],
+['<C-h>','Backspace','essential','insert.txt#i_CTRL-H'],
+['<C-t> / <C-d>','Indent / dedent the current line','daily','insert.txt#i_CTRL-T'],
+['<C-o>{cmd}','One Normal-mode command, then back to insert','essential','insert.txt#i_CTRL-O'],
+['<C-r>{reg}','Paste a register','essential','insert.txt#i_CTRL-R'],
+['<C-r>=','Insert the value of an expression (a calculator)','daily','insert.txt#i_CTRL-R_='],
+['<C-a>','Insert the text you inserted last time','rare','insert.txt#i_CTRL-A'],
+['<C-@>','Insert last inserted text and return to Normal mode','rare','insert.txt#i_CTRL-@'],
+['<C-v>065','Insert a character by decimal code; u00e9 for Unicode','rare','insert.txt#i_CTRL-V_digit'],
+['<C-v><Tab>','Insert a real tab even when expandtab is on','rare','insert.txt#i_CTRL-V'],
+['<C-k>a:','Digraph: type ä; <C-k>-> gives →. See :h digraph-table','rare','insert.txt#i_CTRL-K'],
+['<C-n> / <C-p>','Complete word from the buffer, forwards / backwards','essential','insert.txt#i_CTRL-N'],
+['<C-x><C-f>','Complete a file path','daily','insert.txt#i_CTRL-X_CTRL-F'],
+['<C-x><C-l>','Complete a whole line','daily','insert.txt#i_CTRL-X_CTRL-L'],
+['<C-x><C-o>','Omni completion (language-aware)','daily','insert.txt#i_CTRL-X_CTRL-O'],
+['<C-x><C-]>','Complete from the tags file','rare','insert.txt#i_CTRL-X_CTRL-]'],
+['<C-x><C-k>','Complete from the dictionary file','rare','insert.txt#i_CTRL-X_CTRL-K'],
+['<C-x><C-s>','Spelling suggestions','rare','insert.txt#i_CTRL-X_s'],
+['<C-x><C-v>','Complete Vim commands','rare','insert.txt#i_CTRL-X_CTRL-V'],
+['<C-e> / <C-y>','In a completion popup: cancel / accept the selection','daily','insert.txt#complete_CTRL-E'],
+['<C-y>','Otherwise: copy the character directly above','rare','insert.txt#i_CTRL-Y'],
+['<C-g>u','Break the undo sequence here (useful in mappings)','rare','insert.txt#i_CTRL-G_u'],
+['<C-]>','Expand the abbreviation you just typed','rare','insert.txt#i_CTRL-]'],
+[':set paste / :set nopaste','Stop auto-indent mangling pasted text (or use "+p)','daily','options.txt#\'paste\'']
+]},
+
+{id:'visual',title:'Visual Mode',icon:'▥',note:'Character, line and block selections, and the operators that act on them.',items:[
+['v / V / <C-v>','Characterwise / linewise / blockwise selection','essential','visual.txt#v'],
+['gv','Reselect the previous selection','essential','visual.txt#gv'],
+['o','Jump to the other end of the selection','daily','visual.txt#v_o'],
+['O','In block mode: jump to the other corner','rare','visual.txt#v_O'],
+['aw / ip / i{ …','Text objects extend the selection','essential','motion.txt#text-objects'],
+['<C-v> then I{text}<Esc>','Insert text on every line of the block','daily','visual.txt#v_b_I'],
+['<C-v> then A{text}<Esc>','Append text to every line of the block','daily','visual.txt#v_b_A'],
+['<C-v>$A','Append at the end of every line, ragged lengths and all','daily','visual.txt#v_b_A'],
+['<C-v> then c','Change the block on all lines at once','daily','visual.txt#v_b_c'],
+['<C-v> then r{c}','Fill the whole block with one character','rare','visual.txt#v_b_r'],
+['<C-v> then d / x','Delete a rectangular block (column edit)','daily','change.txt#v_d'],
+['> / <','Indent / dedent the selection (use gv to keep it selected)','essential','change.txt#v_>'],
+['= ','Re-indent the selection','daily','change.txt#v_='],
+['u / U / ~','Lowercase / uppercase / toggle case the selection','daily','change.txt#v_u'],
+['J / gq','Join / reformat the selected lines','daily','change.txt#v_J'],
+[':\'<,\'>!sort','Pipe the selection through an external command','rare','change.txt#v_!'],
+['y / d / c','Yank / delete / change the selection','essential','change.txt#v_d'],
+['p','Replace the selection with the register contents','daily','change.txt#v_p'],
+['g<C-a>','Turn a column of 1s into 1,2,3,4… (numbered lists)','rare','change.txt#v_g_CTRL-A'],
+['<C-g>','Switch to Select mode (behaves like a normal GUI selection)','rare','visual.txt#v_CTRL-G']
+]},
+
+{id:'files',title:'Files, Buffers & Arguments',icon:'🗂',note:'Opening files, moving between buffers, and operating on the argument list.',items:[
+[':e file','Edit a file (path completion with <Tab>)','essential','editing.txt#:edit'],
+[':e!','Reload the file, discarding all changes','daily','editing.txt#:edit!'],
+[':e .','Open a file browser in the current directory','daily','editing.txt#:edit'],
+[':find name','Find a file along the \'path\' option','daily','editing.txt#:find'],
+[':ls  /  :buffers','List open buffers','essential','windows.txt#:ls'],
+[':b {n} / :b name','Switch to buffer by number or by partial name','essential','windows.txt#:buffer'],
+['<C-^>','Toggle between the current and previous file — fastest switch','essential','editing.txt#CTRL-^'],
+[':bn / :bp / :bf / :bl','Next / previous / first / last buffer','essential','windows.txt#:bnext'],
+[':bd  /  :bd!','Close a buffer / close discarding changes','essential','windows.txt#:bdelete'],
+[':%bd|e#','Close every buffer except the current one','daily','windows.txt#:bdelete'],
+[':args *.py','Set the argument list; then :argdo works on those files','daily','editing.txt#:args'],
+[':argdo %s/a/b/ge | update','Run a substitution across every file in the arglist','daily','editing.txt#:argdo'],
+[':bufdo %s/a/b/ge | update','Same, across every open buffer','daily','windows.txt#:bufdo'],
+[':n / :prev','Next / previous file in the argument list','rare','editing.txt#:next'],
+[':sav newname','Save As, and continue editing the new file','daily','editing.txt#:saveas'],
+[':w newname','Write a copy, keep editing the original','essential','editing.txt#:w'],
+[':browse oldfiles','Pick from recently edited files','rare','starting.txt#:oldfiles'],
+[':\'a,\'b w part.txt','Write just a range of lines to another file','rare','editing.txt#:w'],
+[':cd / :lcd / :pwd','Change directory globally / for this window / show it','daily','editing.txt#:cd'],
+['%  %:h  %:t  %:r  %:e','Current file, its dir, tail, root, extension','daily','cmdline.txt#filename-modifiers'],
+[':set autochdir','cd into the directory of whatever file you open','rare','options.txt#\'autochdir\''],
+[':set autoread','Reload files changed outside Vim automatically','daily','options.txt#\'autoread\''],
+[':checktime','Check right now for outside changes','rare','editing.txt#:checktime'],
+['vim -p f1 f2','Open files in tabs; -o / -O for horizontal / vertical splits','daily','starting.txt#-p'],
+['vim -R / view','Open read-only','daily','starting.txt#-R'],
+['vim + file  /  vim +42 file','Open at the last line / at line 42','daily','editing.txt#+cmd'],
+['vim +/pattern file','Open at the first match','daily','editing.txt#+cmd'],
+['vim -d a b','Start in diff mode','daily','starting.txt#-d']
+]},
+
+{id:'windows',title:'Windows & Tabs',icon:'◫',note:'Splits, window sizing and movement, and tab pages.',items:[
+['<C-w>s  /  :sp','Split horizontally','essential','windows.txt#CTRL-W_s'],
+['<C-w>v  /  :vs','Split vertically','essential','windows.txt#CTRL-W_v'],
+['<C-w>n / <C-w>^','New empty split / split with the alternate file','rare','windows.txt#CTRL-W_n'],
+['<C-w>h j k l','Move to the window left / down / up / right','essential','windows.txt#CTRL-W_h'],
+['<C-w>w / <C-w>W','Cycle to next / previous window','essential','windows.txt#CTRL-W_w'],
+['<C-w>p','Jump to the previously used window','daily','windows.txt#CTRL-W_p'],
+['<C-w>c / <C-w>q','Close window / quit window','essential','windows.txt#CTRL-W_c'],
+['<C-w>o','Close every window except this one','daily','windows.txt#CTRL-W_o'],
+['<C-w>H J K L','Move the window to the far left / bottom / top / right','daily','windows.txt#CTRL-W_H'],
+['<C-w>T','Break this window out into its own tab','rare','windows.txt#CTRL-W_T'],
+['<C-w>x / <C-w>r','Exchange with next window / rotate windows','rare','windows.txt#CTRL-W_x'],
+['<C-w>= ','Equalize all window sizes','daily','windows.txt#CTRL-W_='],
+['<C-w>_ / <C-w>|','Maximize height / width','rare','windows.txt#CTRL-W__'],
+['{n}<C-w>+ / -','Grow / shrink height by n','daily','windows.txt#CTRL-W_+'],
+['{n}<C-w>< / >','Shrink / grow width by n','daily','windows.txt#CTRL-W_<'],
+['<C-w>]  /  <C-w>}','Open the tag under cursor in a split / preview window','rare','windows.txt#CTRL-W_]'],
+['<C-w>f','Open the file name under the cursor in a split','daily','windows.txt#CTRL-W_f'],
+['<C-w>gf','Open it in a new tab','rare','windows.txt#CTRL-W_gf'],
+[':tabnew / :tabe file','New tab','essential','tabpage.txt#:tabnew'],
+['gt / gT  /  {n}gt','Next / previous tab / go to tab n','essential','tabpage.txt#gt'],
+[':tabc / :tabo','Close this tab / close all other tabs','daily','tabpage.txt#:tabclose'],
+[':tabmove {n}','Reorder the current tab','rare','tabpage.txt#:tabmove'],
+[':tabdo {cmd}','Run a command in every tab','rare','tabpage.txt#:tabdo'],
+[':windo {cmd}','Run a command in every window','rare','windows.txt#:windo'],
+[':set splitbelow splitright','Open new splits where you expect them','daily','options.txt#\'splitbelow\'']
+]},
+
+{id:'marks',title:'Marks & Jumps',icon:'⚑',note:'Positions recorded manually or by Vim, and the lists that record where you have been.',items:[
+['m{a-z}','Set a mark local to the file','essential','motion.txt#mark-motions'],
+['m{A-Z}','Set a global mark that works across files','daily','motion.txt#mark-motions'],
+['`a  /  \'a','Jump to mark a exactly / to the start of its line','essential','motion.txt#`a'],
+['`` ','Back to where you jumped from','essential','motion.txt#``'],
+['`. / `^','Last change / last insert position','daily','motion.txt#`.'],
+['`[ / `]','Start / end of the last changed or yanked text','rare','motion.txt#`['],
+['`< / `>','Start / end of the last visual selection','rare','motion.txt#`<'],
+[':marks','List all marks','daily','motion.txt#:marks'],
+[':delmarks a b  /  :delmarks!','Delete specific marks / all lowercase marks','rare','motion.txt#:delmarks'],
+['d\'a  /  y`a','Operate from the cursor to a mark','rare','motion.txt#mark-motions'],
+[':jumps','Show the jump list','rare','motion.txt#:jumps'],
+[':changes','Show the change list','rare','motion.txt#:changes'],
+['<C-o> / <C-i>','Walk back / forward through the jump list','essential','motion.txt#CTRL-O'],
+['g; / g,','Walk back / forward through the change list','daily','motion.txt#g;'],
+['\'"','Jump to the position you were at when the file was last closed','daily','motion.txt#`quote']
+]},
+
+{id:'macros',title:'Macros & Repetition',icon:'↻',note:'Recording a sequence of keystrokes and replaying it over lines, ranges or matches.',items:[
+['q{a-z}','Start recording into register a','essential','repeat.txt#q'],
+['q','Stop recording','essential','repeat.txt#q'],
+['@a','Play the macro','essential','repeat.txt#@'],
+['@@','Replay the last macro','essential','repeat.txt#@@'],
+['{n}@a','Play it n times','essential','repeat.txt#@'],
+['100@a','Run until it errors out — a cheap \'do it everywhere\'','daily','repeat.txt#@'],
+['qA','Append more keystrokes to macro a','rare','repeat.txt#q'],
+[':let @a=\'...\'','Edit a macro by hand: paste it with "ap, fix, re-yank','rare','eval.txt#:let-register'],
+[':%normal! @a','Run the macro on every line in the file','daily','various.txt#:normal'],
+[':g/pat/normal! @a','Run it only on matching lines','daily','various.txt#:normal'],
+['<C-v> selection + :\'<,\'>normal! @a','Run it on a visual selection','rare','various.txt#:normal'],
+['qaqqa…q','Clear register a first (qaq), then record','rare','repeat.txt#q'],
+['.','Repeat the last change; often sufficient in place of a macro','essential','repeat.txt#.'],
+['{n}.','Repeat the last change n times','daily','repeat.txt#.']
+]},
+
+{id:'undo',title:'Undo History',icon:'⏱',note:'Undo, redo, and navigation through the undo tree by state or by elapsed time.',items:[
+['u / <C-r>','Undo / redo','essential','undo.txt#u'],
+['U','Undo all recent changes on one line','rare','undo.txt#U'],
+['{n}u','Undo n changes','daily','undo.txt#u'],
+['g- / g+','Move backwards / forwards through undo states in time order','daily','undo.txt#g-'],
+[':earlier 10m  /  :later 5m','Go back 10 minutes / forward 5 minutes','daily','undo.txt#:earlier'],
+[':earlier 3f','Go back 3 file writes','rare','undo.txt#:earlier'],
+[':undolist','Show the branches of the undo tree','rare','undo.txt#:undolist'],
+[':undo {n}','Jump to a specific undo state','rare','undo.txt#:undo'],
+[':set undofile undodir=~/.vim/undo','Persistent undo history that outlives the editing session','daily','options.txt#\'undofile\''],
+[':set undolevels=1000','How much history to keep','rare','options.txt#\'undolevels\'']
+]},
+
+{id:'codenav',title:'Code Navigation: Tags, Quickfix, Grep',icon:'⌗',note:'Tag-based navigation, the quickfix list and grep integration. Requires no plugins and works over SSH.',items:[
+['ctags -R .','Generate a tags file for the project (run in the shell)','daily','tagsrch.txt#ctags'],
+['<C-]>  /  g<C-]>','Jump to definition / show a menu if ambiguous','essential','tagsrch.txt#CTRL-]'],
+['<C-t>','Jump back up the tag stack','essential','tagsrch.txt#CTRL-T'],
+[':tag name  /  :tj name','Jump to a tag by name / list matches','daily','tagsrch.txt#:tag'],
+[':tn / :tp / :ts','Next / previous / select among matching tags','rare','tagsrch.txt#:tnext'],
+[':tags','Show the tag stack','rare','tagsrch.txt#:tags'],
+['<C-w>}','Show the definition in the preview window','daily','windows.txt#CTRL-W_}'],
+[':pc / :pclose','Close the preview window','rare','windows.txt#:pclose'],
+[':ptag name','Open a tag in the preview window','rare','windows.txt#:ptag'],
+[':set tags=./tags;,tags','Search up the directory tree for a tags file','daily','options.txt#\'tags\''],
+[':make','Run \'makeprg\' and load errors into the quickfix list','daily','quickfix.txt#:make'],
+[':cw / :copen / :cclose','Open quickfix if there are errors / open / close','daily','quickfix.txt#:copen'],
+[':cn / :cp','Jump to next / previous error','essential','quickfix.txt#:cnext'],
+[':cc {n}','Jump to error n','rare','quickfix.txt#:cc'],
+[':cfirst / :clast','First / last error','rare','quickfix.txt#:cfirst'],
+[':cnf / :cpf','First error in the next / previous file','rare','quickfix.txt#:cnfile'],
+[':cdo {cmd}  /  :cfdo {cmd}','Run a command on every quickfix entry / file','daily','quickfix.txt#:cdo'],
+[':cdo s/a/b/ge | update','Project-wide search and replace, done properly','daily','quickfix.txt#:cdo'],
+[':vimgrep /pat/ **/*.py','Vim\'s own recursive grep into the quickfix list','daily','quickfix.txt#:vimgrep'],
+[':vimgrep /pat/j %','Search the current file without jumping','rare','quickfix.txt#:vimgrep'],
+[':grep -rn pat .','Use the external grep (set grepprg=rg\\ --vimgrep for ripgrep)','daily','quickfix.txt#:grep'],
+[':lvimgrep / :lopen / :lne','The same, but per-window location lists','rare','quickfix.txt#:lvimgrep'],
+[':cexpr system(\'rg --vimgrep pat\')','Load any tool\'s output into the quickfix list','rare','quickfix.txt#:cexpr'],
+[':set errorformat=…','Teach quickfix how to parse your compiler\'s output','rare','options.txt#\'errorformat\''],
+['gf  /  <C-w>f','Open the file under the cursor / in a split','essential','editing.txt#gf'],
+['gF','Open it and jump to the line number after the colon','daily','editing.txt#gF'],
+[':set path+=**','Make :find and gf search the whole tree','daily','options.txt#\'path\''],
+['[I  /  [i','List / show all lines containing the word under the cursor','daily','tagsrch.txt#[I'],
+['[<C-i>','Jump to the first of those lines','rare','tagsrch.txt#[_CTRL-I'],
+['[D / [d','The same for #defines','rare','tagsrch.txt#[D'],
+['K','Look up the word under the cursor in man (or \'keywordprg\')','daily','various.txt#K']
+]},
+
+{id:'fold',title:'Folding',icon:'⊟',note:'Collapsing regions of a file, by indentation, syntax, markers or an expression.',items:[
+['zf{motion}','Create a fold over a motion (manual foldmethod)','daily','fold.txt#zf'],
+['zf%','Fold the current brace block','daily','fold.txt#zf'],
+['za / zA','Toggle this fold / toggle it recursively','daily','fold.txt#za'],
+['zo / zc','Open / close a fold','daily','fold.txt#zo'],
+['zO / zC','Open / close all folds under the cursor','daily','fold.txt#zO'],
+['zR / zM','Open every fold / close every fold','daily','fold.txt#zR'],
+['zr / zm','Open / close one level everywhere','daily','fold.txt#zr'],
+['zd / zD / zE','Delete this fold / recursively / all folds','rare','fold.txt#zd'],
+['zj / zk','Move to the start of the next / end of the previous fold','rare','fold.txt#zj'],
+['[z / ]z','Move to the start / end of the current open fold','rare','fold.txt#[z'],
+[':set foldmethod=indent','Fold by indentation — instant structure on any file','daily','fold.txt#fold-indent'],
+[':set foldmethod=syntax','Fold using the syntax rules of the language','daily','fold.txt#fold-syntax'],
+[':set foldmethod=marker','Fold on {{{ }}} markers in comments','daily','fold.txt#fold-marker'],
+[':set foldmethod=expr','Fold using a custom expression','rare','fold.txt#fold-expr'],
+[':set foldlevel=1  /  foldlevelstart','How deep folds are open when you open a file','rare','options.txt#\'foldlevel\''],
+[':set foldcolumn=2','Show a fold indicator column in the gutter','rare','options.txt#\'foldcolumn\''],
+[':%foldopen!','Open every fold in the file','rare','fold.txt#:foldopen']
+]},
+
+{id:'diff',title:'Diff Mode',icon:'⇄',note:'Comparing files side by side and transferring changes between them.',items:[
+['vim -d a b  /  vimdiff a b','Start diffing two files','daily','diff.txt#diff'],
+[':diffthis','Make this window part of the diff','rare','diff.txt#:diffthis'],
+[':diffsplit other','Split and diff against another file','daily','diff.txt#:diffsplit'],
+[':diffoff  /  :diffoff!','Turn diff off in this window / all windows','daily','diff.txt#:diffoff'],
+[']c / [c','Next / previous difference','daily','diff.txt#]c'],
+['do  /  :diffget','Obtain the change from the other window','daily','diff.txt#do'],
+['dp  /  :diffput','Push this change to the other window','daily','diff.txt#dp'],
+[':diffupdate','Recalculate after editing','rare','diff.txt#:diffupdate'],
+[':set diffopt+=iwhite','Ignore whitespace changes','rare','options.txt#\'diffopt\''],
+[':set diffopt+=vertical','Always diff in vertical splits','rare','options.txt#\'diffopt\''],
+[':w !diff % -','Diff the buffer against the file on disk','rare','editing.txt#:w_c'],
+[':set scrollbind cursorbind','Lock two windows to scroll together','rare','options.txt#\'scrollbind\'']
+]},
+
+{id:'terminal',title:'Terminal & Shell',icon:'▶',note:'Running shell commands and interactive shells from within Vim.',items:[
+[':term  /  :terminal','Open a real shell in a Vim window','daily','terminal.txt#:terminal'],
+[':term ++curwin  /  ++rows=10','Control where and how big the terminal is','rare','terminal.txt#:terminal'],
+[':vert term','Open the terminal in a vertical split','daily','windows.txt#:vertical'],
+['<C-w>N  or  <C-\\><C-n>','Leave terminal-job mode to scroll and yank','rare','terminal.txt#t_CTRL-W_N'],
+['i / a','Return to interacting with the shell','daily','terminal.txt#Terminal-mode'],
+['<C-w>:','Run an Ex command from inside the terminal window','rare','terminal.txt#t_CTRL-W_:'],
+['<C-w>"a','Paste register a into the terminal','rare','terminal.txt#t_CTRL-W_quote'],
+[':!cmd','Run one shell command and show its output','daily','various.txt#:!cmd'],
+[':!!','Repeat the last shell command','daily','various.txt#:!!'],
+[':shell  /  :sh','Drop to a shell; type exit to come back','daily','various.txt#:shell'],
+['<C-z>','Suspend Vim; fg in the shell brings it back','daily','starting.txt#CTRL-Z'],
+[':!%:p','Execute the current file','rare','cmdline.txt#filename-modifiers'],
+[':!chmod +x %','Make the file being edited executable','daily','various.txt#:!cmd'],
+[':term ++close ./run.sh','Run a script and close the window when it finishes','rare','terminal.txt#:terminal']
+]},
+
+{id:'format',title:'Indent, Format & Whitespace',icon:'⇥',note:'Indentation settings, text width and wrapping, line endings and encodings.',items:[
+[':set expandtab','Insert spaces instead of tab characters','daily','options.txt#\'expandtab\''],
+[':set tabstop=4 shiftwidth=4 softtabstop=4','The usual 4-space setup','daily','options.txt#\'tabstop\''],
+[':set autoindent smartindent','Keep / guess indentation on new lines','daily','options.txt#\'autoindent\''],
+[':filetype indent on','Use the language\'s real indent rules','daily','filetype.txt#:filetype-indent-on'],
+[':retab','Convert existing tabs to spaces (or back with :retab!)','daily','change.txt#:retab'],
+[':set list listchars=tab:▸\\ ,trail:·','Make tabs and trailing spaces visible','daily','options.txt#\'listchars\''],
+[':set textwidth=80','Wrap text automatically at column 80','daily','options.txt#\'textwidth\''],
+[':set colorcolumn=80','Draw a vertical ruler at column 80','daily','options.txt#\'colorcolumn\''],
+[':set wrap linebreak breakindent','Soft-wrap at word boundaries, keeping indent','daily','options.txt#\'linebreak\''],
+[':set formatoptions-=cro','Stop Vim auto-continuing comments on new lines','rare','change.txt#fo-table'],
+['gq / gw','Reformat text to textwidth','daily','change.txt#gq'],
+['=','Re-indent using the indent rules','daily','change.txt#='],
+[':set equalprg=black\\ -q\\ -','Make = run an external formatter','rare','options.txt#\'equalprg\''],
+[':set fileformat=unix','Fix CRLF line endings; :set ff? to check','daily','options.txt#\'fileformat\''],
+[':e ++ff=dos','Reopen a file forcing a line-ending format','rare','editing.txt#++ff'],
+[':set fileencoding=utf-8','Set the encoding used when writing','rare','options.txt#\'fileencoding\''],
+[':e ++enc=latin1','Reopen a file with a different encoding','rare','editing.txt#++enc']
+]},
+
+{id:'options',title:'Options',icon:'⚙',note:'Set interactively with :set; make permanent in ~/.vimrc. :set opt? reports the value, :set opt! toggles it.',items:[
+[':set number relativenumber','Line numbers; relative makes 7j / d5k obvious','daily','options.txt#\'relativenumber\''],
+[':set cursorline','Highlight the line the cursor is on','daily','options.txt#\'cursorline\''],
+[':set scrolloff=5','Always keep 5 lines of context above and below','daily','options.txt#\'scrolloff\''],
+[':set sidescrolloff=8','The same, horizontally','rare','options.txt#\'sidescrolloff\''],
+[':set ignorecase smartcase','Case-insensitive search unless you type a capital','daily','options.txt#\'smartcase\''],
+[':set hlsearch incsearch','Highlight matches, and search as you type','daily','options.txt#\'incsearch\''],
+[':set wildmenu wildmode=longest:full,full','A usable command-line completion menu','daily','options.txt#\'wildmode\''],
+[':set wildignore=*.o,*.pyc,node_modules/**','Keep junk out of completion and :find','daily','options.txt#\'wildignore\''],
+[':set hidden','Switch away from modified buffers without saving','daily','options.txt#\'hidden\''],
+[':set confirm','Ask to save instead of refusing to quit','daily','options.txt#\'confirm\''],
+[':set mouse=a','Mouse support, including inside tmux','daily','options.txt#\'mouse\''],
+[':set clipboard=unnamedplus','Make y and p use the system clipboard by default','daily','options.txt#\'clipboard\''],
+[':set undofile','Undo history that persists across sessions','daily','options.txt#\'undofile\''],
+[':set noswapfile / :set directory=~/.vim/swap//','Disable swap files or keep them out of your tree','daily','options.txt#\'directory\''],
+[':set backupdir=~/.vim/backup//','Keep backup files out of your project','rare','options.txt#\'backupdir\''],
+[':set lazyredraw','Don\'t redraw during macros — much faster','rare','options.txt#\'lazyredraw\''],
+[':set ttyfast','Assume a fast terminal connection','rare','options.txt#\'ttyfast\''],
+[':set timeoutlen=500 ttimeoutlen=10','Stop Esc feeling sluggish in terminals','rare','options.txt#\'timeoutlen\''],
+[':set updatetime=300','How quickly CursorHold and swap writes fire','rare','options.txt#\'updatetime\''],
+[':set signcolumn=yes','Stop the gutter jumping in and out','rare','options.txt#\'signcolumn\''],
+[':set termguicolors','True colour in a modern terminal','daily','options.txt#\'termguicolors\''],
+[':set background=dark','Tell the colourscheme which way round you are','daily','options.txt#\'background\''],
+[':syntax on  /  :syntax off','Syntax highlighting; disabling it speeds up very large files','daily','syntax.txt#:syntax-on'],
+[':set spell spelllang=en_us','Spell checking','daily','options.txt#\'spell\''],
+[':set virtualedit=block','Let block selections go past the end of short lines','rare','options.txt#\'virtualedit\''],
+[':set inccommand=split','(Neovim) live preview of :s as you type it','rare','options.txt'],
+[':set shortmess+=I','Skip the intro screen','rare','options.txt#\'shortmess\''],
+[':set laststatus=2','Always show the status line','rare','options.txt#\'laststatus\''],
+[':set showcmd ruler','Show pending commands and the cursor position','rare','options.txt#\'showcmd\''],
+[':set modeline','Honour per-file settings in a # vim: ts=2 comment','rare','options.txt#\'modeline\''],
+[':verbose set opt?','Show a value and the file that last set it','daily','various.txt#:verbose'],
+[':options','An interactive, browsable list of every option','rare','options.txt#:options']
+]},
+
+{id:'map',title:'Mappings & Abbreviations',icon:'⌘',note:'Defining key mappings and abbreviations. Prefer the non-recursive :noremap forms.',items:[
+[':nnoremap / :inoremap / :vnoremap','Map in Normal / Insert / Visual mode, non-recursively','daily','map.txt#:nnoremap'],
+[':noremap','Map in Normal, Visual and Operator-pending modes','rare','map.txt#:noremap'],
+[':map','Recursive — almost always the wrong choice','rare','map.txt#:map'],
+[':let mapleader=" "','Set the leader key (space is a popular choice)','daily','map.txt#mapleader'],
+[':nnoremap <leader>w :w<CR>','Example: space-w to save','daily','map.txt#mapleader'],
+[':nnoremap <leader>n :noh<CR>','Clear search highlighting','daily','map.txt#mapleader'],
+[':inoremap jk <Esc>','Escape without reaching for the corner','daily','map.txt#:inoremap'],
+[':nnoremap <silent> …','Don\'t echo the command when it runs','rare','map.txt#:map-silent'],
+[':nnoremap <expr> …','The mapping\'s right-hand side is an expression','rare','map.txt#:map-expression'],
+[':unmap / :nunmap','Remove a mapping','rare','map.txt#:unmap'],
+[':map  (no args)','List all mappings','rare','map.txt#map-listing'],
+[':verbose nmap <leader>w','Show which file defined a mapping','rare','map.txt#:map-verbose'],
+[':iabbrev teh the','Auto-correct as you type','rare','map.txt#:iabbrev'],
+[':iabbrev @@ me@example.com','Expand a shortcut into boilerplate','rare','map.txt#:iabbrev'],
+[':cnoremap w!! w !sudo tee > /dev/null %','Sudo-save, as a command-line mapping','rare','map.txt#:cnoremap'],
+[':onoremap …','Map in operator-pending mode to invent new text objects','rare','map.txt#:onoremap']
+]},
+
+{id:'autocmd',title:'Autocommands',icon:'◷',note:'Commands run automatically on events such as opening, writing or changing a file.',items:[
+[':autocmd BufWritePre * %s/\\s\\+$//e','Strip trailing whitespace on every save','daily','autocmd.txt#BufWritePre'],
+[':autocmd FileType python setlocal ts=4 sw=4','Per-language settings','daily','autocmd.txt#FileType'],
+[':autocmd BufRead,BufNewFile *.conf set ft=conf','Assign a filetype by extension','daily','autocmd.txt#BufReadPost'],
+[':autocmd BufWritePost .vimrc source %','Reload your config when you save it','daily','autocmd.txt#BufWritePost'],
+[':autocmd VimEnter * …','Run something at startup','rare','autocmd.txt#VimEnter'],
+[':autocmd InsertLeave * set nopaste','Undo a temporary setting automatically','rare','autocmd.txt#InsertLeave'],
+[':augroup mygroup / autocmd! / augroup END','Wrap autocmds so reloading doesn\'t duplicate them','daily','autocmd.txt#:augroup'],
+[':autocmd  (no args)','List every autocommand currently defined','rare','autocmd.txt#:autocmd'],
+[':doautocmd FileType','Fire the autocommands manually','rare','autocmd.txt#:doautocmd'],
+[':set eventignore=all','Temporarily disable autocommands','rare','options.txt#\'eventignore\'']
+]},
+
+{id:'netrw',title:'File Browsing, Archives & Remote',icon:'🌐',note:'The built-in file browser, transparent editing of archives, and remote files over ssh and ftp.',items:[
+[':Ex  /  :Explore','Open netrw in the current window','daily','pi_netrw.txt#:Explore'],
+[':Sex / :Vex / :Tex','Explore in a horizontal / vertical split / new tab','rare','pi_netrw.txt#:Sexplore'],
+[':Lex 30','Open a 30-column file tree on the left','daily','pi_netrw.txt#:Lexplore'],
+['-','In netrw: go up one directory','daily','pi_netrw.txt#netrw--'],
+['<CR>  /  o  /  v  /  t','Open the entry here / in a split / vsplit / tab','daily','pi_netrw.txt#netrw-cr'],
+['%  /  d','Create a new file / new directory','rare','pi_netrw.txt#netrw-%'],
+['D  /  R','Delete / rename the file under the cursor','rare','pi_netrw.txt#netrw-D'],
+['i','Cycle the listing style (thin, long, wide, tree)','rare','pi_netrw.txt#netrw-i'],
+['s / r','Change the sort order / reverse it','rare','pi_netrw.txt#netrw-s'],
+['gh','Toggle hidden (dotfile) display','rare','pi_netrw.txt#netrw-gh'],
+['mf / mx','Mark files / run a shell command on the marked files','rare','pi_netrw.txt#netrw-mf'],
+[':e scp://host//path/file','Edit a file on a remote machine over SSH','daily','pi_netrw.txt#netrw-transparent'],
+[':e sftp://host/file  /  dav:// ftp://','Other remote protocols netrw understands','rare','pi_netrw.txt#netrw-externapp'],
+[':e file.tar.gz','Browse inside an archive and edit files in place','daily','pi_tar.txt#tar'],
+[':e file.zip','The same for zip files','daily','pi_zip.txt#zip'],
+[':e file.gz','Gzipped files are decompressed transparently','rare','pi_gzip.txt#gzip'],
+[':Ntree / :NetrwSettings','Set the tree root / show netrw\'s options','rare','pi_netrw.txt#netrw-settings']
+]},
+
+{id:'spell',title:'Spelling',icon:'✓',note:'Spell checking, navigation between misspellings, and managing the word list.',items:[
+[':set spell  /  :set nospell','Enable / disable spell checking','daily','options.txt#\'spell\''],
+[':set spelllang=en_us,de','Check against several languages','rare','options.txt#\'spelllang\''],
+[']s / [s','Next / previous misspelled word','daily','spell.txt#]s'],
+['z=','Show spelling suggestions','daily','spell.txt#z='],
+['1z=','Take the first suggestion without a menu','rare','spell.txt#z='],
+['zg / zw','Add the word to the dictionary / mark it wrong','daily','spell.txt#zg'],
+['zug / zuw','Undo zg / zw for that word','rare','spell.txt#zug'],
+[':set spellfile=~/.vim/spell/en.utf-8.add','Where your added words are stored','rare','options.txt#\'spellfile\''],
+[':set spellsuggest=best,10','Tune the suggestion list','rare','options.txt#\'spellsuggest\''],
+['<C-x><C-s>','Spelling completion while in insert mode','rare','insert.txt#i_CTRL-X_s']
+]},
+
+{id:'session',title:'Sessions, Views & State',icon:'💾',note:'Saving and restoring window layouts, per-file views, and the viminfo state.',items:[
+[':mksession ~/work.vim','Save windows, tabs, buffers and options to a file','daily','starting.txt#:mksession'],
+[':mksession! ~/work.vim','Overwrite an existing session','rare','starting.txt#:mksession'],
+['vim -S ~/work.vim','Restore the session','daily','starting.txt#-S'],
+[':source ~/work.vim','Restore it from inside Vim','rare','repeat.txt#:source'],
+[':set sessionoptions=buffers,curdir,folds,tabpages,winsize','Choose what gets saved','rare','options.txt#\'sessionoptions\''],
+[':mkview  /  :loadview','Save and restore folds and the cursor position for one file','rare','starting.txt#:mkview'],
+[':set viewoptions=folds,cursor','What :mkview remembers','rare','options.txt#\'viewoptions\''],
+[':rviminfo / :wviminfo','Read / write the viminfo file (registers, marks, history)','rare','starting.txt#:rviminfo'],
+[':set viminfo=\'1000,<50,s10,h','Keep marks and registers for 1000 files','rare','options.txt#\'viminfo\''],
+[':scriptnames','List every script Vim has sourced — config debugging','daily','repeat.txt#:scriptnames']
+]},
+
+{id:'vimscript',title:'Vimscript',icon:'λ',note:'The subset required to configure Vim and write small functions.',items:[
+[':let x = 5  /  :let s:name = \'x\'','Variables; s: is script-local, g: global, b: buffer-local','daily','eval.txt#:let'],
+[':echo expr  /  :echom expr','Print an expression / print and keep it in :messages','daily','eval.txt#:echo'],
+[':messages','See past messages','daily','message.txt#:messages'],
+[':let &opt = value','Set an option from an expression','rare','eval.txt#:let-option'],
+[':let &l:opt / :setlocal','Window- or buffer-local option','rare','options.txt#:setlocal'],
+[':function! Name(a, b) … endfunction','Define a function (! allows redefining)','daily','userfunc.txt#:function'],
+[':call Name(1, 2)','Call it as a statement','daily','userfunc.txt#:call'],
+[':return a:a + a:b','a: prefixes function arguments','rare','userfunc.txt#:return'],
+[':if … elseif … else … endif','Conditionals','daily','eval.txt#:if'],
+[':for i in range(10) … endfor','Loop over a list or a range','rare','eval.txt#:for'],
+[':while cond … endwhile','While loop','rare','eval.txt#:while'],
+[':execute \'normal! \' . cmd','Build and run a command from a string','rare','eval.txt#:execute'],
+[':normal! gg=G','Run Normal-mode keys from a script (! ignores mappings)','daily','various.txt#:normal'],
+[':silent! cmd','Run without output, ignoring errors','rare','various.txt#:silent'],
+['expand(\'%:p\')  /  fnamemodify()','File path helpers','daily','builtin.txt#expand()'],
+['getline(1,\'$\')  /  setline()','Read / write buffer lines','rare','builtin.txt#getline()'],
+['system(\'ls\')  /  systemlist()','Run a shell command and capture its output','rare','builtin.txt#system()'],
+['has(\'unix\')  /  executable(\'rg\')','Feature and program detection for portable configs','rare','builtin.txt#has()'],
+[':source file.vim  /  :runtime','Load a script / load from the runtimepath','daily','repeat.txt#:source'],
+[':command! Name cmd','Define your own Ex command (must start uppercase)','daily','map.txt#:command'],
+[':debug cmd  /  :breakadd','Step through a script; see :h debug','rare','repeat.txt#:debug'],
+[':profile start log | :profile func *','Find out what makes your vimrc slow','rare','repeat.txt#:profile'],
+[':verbose function Foo','Show a function\'s definition and where it came from','rare','userfunc.txt#:function']
+]},
+
+{id:'cmdline',title:'Command-Line Mode',icon:'❯',note:'Editing, completion and history on the : and / command lines.',items:[
+['<C-r><C-w>','Insert the word under the cursor into the command line','daily','cmdline.txt#c_CTRL-R_CTRL-W'],
+['<C-r><C-a>','Insert the WORD under the cursor','rare','cmdline.txt#c_CTRL-R_CTRL-A'],
+['<C-r><C-f>','Insert the file name under the cursor','rare','cmdline.txt#c_CTRL-R_CTRL-F'],
+['<C-r>{reg}','Insert a register','daily','cmdline.txt#c_CTRL-R'],
+['<C-r>=expand(\'%:h\')<CR>','Insert the result of an expression','rare','cmdline.txt#c_CTRL-R_='],
+['<C-f>','Open the command-line window — edit commands as text','daily','cmdline.txt#c_CTRL-F'],
+['q: / q/ / q?','Open that window directly for commands / searches','daily','cmdline.txt#q:'],
+['<Up> / <Down>','History filtered by what you have typed so far','daily','cmdline.txt#c_<Up>'],
+['<C-p> / <C-n>','Plain history, unfiltered','rare','cmdline.txt#c_CTRL-P'],
+['<Tab> / <C-d>','Complete / list all completions','daily','cmdline.txt#c_CTRL-D'],
+['<C-w> / <C-u>','Delete previous word / whole line','daily','cmdline.txt#c_CTRL-W'],
+['<C-v>{key}','Insert a key literally (handy when writing mappings)','rare','cmdline.txt#c_CTRL-V'],
+[':history','Show the command history','rare','cmdline.txt#:history'],
+['|','Chain Ex commands: :w | bd','daily','cmdline.txt#:bar'],
+[':cmd | cmd','Note: some commands (:normal, :g) swallow the rest of the line','rare','cmdline.txt#:bar'],
+['<C-c> / <Esc>','Abandon the command line','daily','cmdline.txt#c_CTRL-C']
+]},
+
+{id:'sysadmin',title:'System Administration & Large Files',icon:'🛠',note:'Working on unfamiliar systems, remote and read-only files, and files too large for default settings.',items:[
+[':w !sudo tee % >/dev/null','Write a root-owned file opened without sudo','daily','editing.txt#:w_c'],
+['vim -u NONE -N file','Start with no config at all — isolate a plugin problem','daily','starting.txt#-u'],
+['vim -u NONE -N -c \'set nu\'','No config, but with a couple of options','rare','starting.txt#-c'],
+['vim --clean file','Modern equivalent: defaults, no user config','daily','starting.txt#--clean'],
+['vim -R / view file','Read-only, so you cannot damage anything','daily','starting.txt#-R'],
+['vim -b file  /  :%!xxd','Binary mode / view the buffer as a hex dump','daily','starting.txt#-b'],
+[':%!xxd -r','Convert the hex dump back to binary before saving','rare','tips.txt#hex-editing'],
+[':set noeol binary','Stop Vim adding a trailing newline to a binary file','rare','options.txt#\'endofline\''],
+['vim -M','Really unmodifiable, not just read-only','rare','starting.txt#-M'],
+['vim scp://host//etc/nginx/nginx.conf','Edit a remote config directly over SSH','daily','pi_netrw.txt#netrw-transparent'],
+[':e ++ff=dos file','Open a Windows-line-ending file cleanly','daily','editing.txt#++ff'],
+[':set ff=unix | :w','Convert CRLF to LF and save','daily','options.txt#\'fileformat\''],
+[':set nowrap | :set sidescroll=1','Deal with very long log lines','daily','options.txt#\'sidescroll\''],
+[':set syntax=off | :set noundofile','Make a huge file usable again','daily','options.txt#\'syntax\''],
+['vim -c \'set bt=nofile\' -','Read piped stdin into a scratch buffer','rare','options.txt#\'buftype\''],
+['dmesg | vim -','Pipe any command\'s output straight into Vim','daily','starting.txt#--'],
+[':recover file  /  vim -r file','Recover after a crash from the swap file','daily','recover.txt#:recover'],
+[':set readonly! ','Toggle read-only protection','rare','options.txt#\'readonly\''],
+[':e! ','Throw away your changes and reload from disk','daily','editing.txt#:edit!'],
+[':earlier 1f','Undo everything back to the last write','rare','undo.txt#:earlier'],
+['vim -c \'g/ERROR/p\' -c \'q\' log.txt','Use Vim as a one-shot filter from the shell','rare','starting.txt#-c']
+]},
+
+{id:'gems',title:'Lesser-Known Commands',icon:'✦',note:'Capabilities that are easily missed in the reference manual.',items:[
+['g<C-a> on a visual block','Number a list 1, 2, 3… automatically','daily','change.txt#v_g_CTRL-A'],
+['<C-a> on 0x1f / 007','Arithmetic understands hex and octal (:set nrformats)','rare','options.txt#\'nrformats\''],
+['gJ in a macro','Join lines without the space Vim would normally add','rare','change.txt#gJ'],
+[':%!column -t','Align columns of text with one command','daily','change.txt#:range!'],
+[':%!tac  /  :g/^/m0','Reverse the order of every line in the file','rare','change.txt#:move'],
+[':sort!  /  :sort n  /  :sort u','Reverse, numeric and deduplicating sorts, built in','daily','change.txt#:sort'],
+['g<C-g>','Word, line, character and byte count for the file or selection','daily','editing.txt#g_CTRL-G'],
+['ga / g8','Inspect the character under the cursor (code point, UTF-8 bytes)','rare','various.txt#ga'],
+['<C-k> digraphs','Type →, €, ½, ä without a compose key','rare','digraph.txt#digraphs'],
+[':set virtualedit=all','Put the cursor where no character exists — ASCII diagrams','rare','options.txt#\'virtualedit\''],
+['<C-v> then $ then A','Append to ragged-length lines in one motion','rare','visual.txt#v_b_A'],
+[':set scrollbind','Scroll two files together side by side','rare','options.txt#\'scrollbind\''],
+['zf then zj/zk','Build and walk manual folds to outline any file','rare','fold.txt#zf'],
+['gx','Open the URL under the cursor in your browser','daily','eval.txt#gx'],
+['gv after p','Reselect and re-paste when replacing repeatedly','rare','visual.txt#gv'],
+[':earlier 30s','Rewind the file by wall-clock time, not by change count','rare','undo.txt#:earlier'],
+['q: then edit then <CR>','Fix a long Ex command with full Vim editing','daily','cmdline.txt#q:'],
+['<C-o> / <C-i> across files','The jump list works across buffers, like a browser\'s back button','daily','motion.txt#CTRL-O'],
+[':Man printf  /  K','Read man pages inside Vim (:runtime ftplugin/man.vim)','rare','filetype.txt#:Man'],
+[':help quickref','One screenful that covers most of what you need','daily','quickref.txt#quickref']
+]}
+];
+
+const DEMOS = {
+'survival::i / a':['let x = ‸42;','let x = «1»‸42;','i inserts before the cursor; a would start after the 4'],
+'survival::I / A':['    let x = 42;‸','    «// »let x = 42;','I jumps to the first non-blank, then inserts'],
+'survival::o / O':['let x = 42;‸','let x = 42;\n«‸»','o opens a line below and puts you in insert (O opens above)'],
+'survival::R':['cost = ‸1234','cost = «99»34','R overtypes instead of pushing text right'],
+'survival::v / V / <C-v>':['the ‸quick brown fox','the «quick»‸ brown fox','v then e — selection grows with any motion'],
+'survival::gi':['name = "bob"‸  … you moved away, then pressed gi','name = "bob‸"','back to the exact spot you last left insert mode'],
+'survival::.':['«foo»bar baz\nfoo qux','«X»bar baz\n«X»ux','cw X on line 1, then . repeats the entire change on line 2'],
+'survival::u / <C-r>':['let x = «99»;','let x = «42»;','u reverses one change at a time; <C-r> reapplies it'],
+'motion::h j k l':['one ‸two\nthree four','one two\nthr‸ee four','j moves down a line, keeping roughly the same column'],
+'motion::w / W':['‸the quick brown fox','the ‸quick brown fox','w stops at each word start; W treats punctuation as part of the word'],
+'motion::e / E':['‸the quick brown fox','th‸e quick brown fox','e lands on the last character of the word'],
+'motion::b / B':['the quick ‸brown fox','the ‸quick brown fox','b walks back to the previous word start'],
+'motion::0 / ^ / $':['    let x = ‸42;','    let x = 42;‸','$ to the line end; 0 to column 1; ^ to the first non-blank'],
+'motion::f{c} / F{c}':['‸foo(bar, baz)','foo(bar‸, baz)','f, jumps onto the next comma on this line'],
+'motion::t{c} / T{c}':['‸foo(bar, baz)','foo(ba‸r, baz)','t, stops just before the comma — the \'till\' motion'],
+'motion::;  /  ,':['foo(bar‸, baz, qux)','foo(bar, baz‸, qux)','; repeats the last f/t jump forward'],
+'motion::gg / G':['line 1\nline 2\nline ‸3','line ‸1\nline 2\nline 3','gg to the top, G to the bottom'],
+'motion::{n}G  or  :{n}':['1: alpha\n2: beta‸\n3: gamma','1: alpha\n2: beta\n3: ‸gamma','3G jumps straight to line 3'],
+'motion::{ / }':['para one‸\n\npara two','para one\n\n‸para two','} hops to the next blank line — paragraph at a time'],
+'motion::%':['if ‸(a && (b || c)) {','if (a && (b || c)‸) {','% jumps between matching brackets'],
+'motion::*  /  #':['let ‸count = 0;\nprint(count)','let count = 0;\nprint(‸«count»)','* searches forward for the whole word under the cursor'],
+'motion::`.  /  \'.':['edited here earlier\n‸cursor now','«edited» here earlier\ncursor now','`. teleports to your last edit, wherever it was'],
+'motion::zz / zt / zb':['… cursor near the bottom edge','… «cursor line now centred»','zz redraws with your line in the middle of the screen'],
+'objects::iw / aw':['the qu‸ick brown fox','the «» brown fox','diw removes the word; daw would take the trailing space too'],
+'objects::iW / aW':['run ./sc‸ript.sh --now','run «» --now','diW — a WORD is anything between spaces, dots and all'],
+'objects::ip / ap':['alpha\nbe‸ta\n\ngamma','«»\n\ngamma','dip deletes the whole paragraph block the cursor sits in'],
+'objects::i" / a"':['name = "jo‸hn doe";','name = "«»";','ci" wipes the contents and leaves the quotes'],
+'objects::i\' / a\'':['path = \'sr‸c/main.py\'','path = \'«»\'','works the same for single quotes and backticks'],
+'objects::i( i) ib':['fn(a‸rg1, arg2)','fn(«»)','di( empties the parens, keeps them'],
+'objects::a( a) ab':['result = fn(a‸rg1, arg2);','result = fn«»;','da( takes the parentheses with it'],
+'objects::i{ i} iB':['if (x) {\n  do‸Thing();\n}','if (x) {\n«»\n}','di{ clears a block body'],
+'objects::ci"':['title = "old ti‸tle";','title = "«new»‸";','the most frequently used operator and text-object pair'],
+'objects::di(':['log("msg", ‸err, 2)','log«»','di( inside, da( including the brackets'],
+'edit::x / X':['hello‸ world','hell‸ world','x deletes the character under the cursor'],
+'edit::d{motion}':['the ‸quick brown fox','the ‸brown fox','dw — the operator eats exactly what the motion covers'],
+'edit::dd / D':['alpha\nbe‸ta\ngamma','alpha\n‸gamma','dd removes the whole line; D removes from the cursor to the end'],
+'edit::c{motion}':['the ‸quick brown fox','the «slow»‸ brown fox','cw deletes the word and leaves you in insert'],
+'edit::cc / C':['    let x = ‸42;','    «‸»','cc clears the line but keeps its indent'],
+'edit::s / S':['hel‸lo','hel«p»‸o','s deletes one char and inserts; S does the whole line'],
+'edit::y{motion} / yy / Y':['const ‸name = \'x\';','const name = \'x\';\n«const name = \'x\';»','yy then p — copy a line, paste it below'],
+'edit::p / P':['«yanked»  …buffer:  one\n‸two','one\ntwo\n«yanked»','p puts a linewise yank on the line below'],
+'edit::r{c} / gr{c}':['let x = ‸4;','let x = «9»;','r9 swaps one character, no insert mode needed'],
+'edit::J / gJ':['const a = 1;‸\n  const b = 2;','const a = 1;« »const b = 2;','J joins and tidies the whitespace; gJ joins raw'],
+'edit::<C-a> / <C-x>':['port = ‸8080','port = «8081»','<C-a> increments the next number on the line'],
+'edit::>> / <<':['‸return true;','«    »return true;','>> indents by one shiftwidth; 3>> does three lines'],
+'edit::={motion} / ==':['if (x) {\n‸do();\n}','if (x) {\n«  »do();\n}','= re-indents using the language\'s own rules'],
+'edit::dw / de / d$ / d0':['the qu‸ick brown fox','the qu‸brown fox','dw from the cursor to the next word start'],
+'edit::d/foo<CR>':['alpha ‸beta gamma DONE tail','alpha ‸DONE tail','d/DONE — delete up to whatever you search for'],
+'edit::dt) / df)':['fn(a‸rg, x) + 1','fn(a‸) + 1','dt) stops before the bracket; df) swallows it'],
+'edit::3dd / d3j':['l1\n‸l2\nl3\nl4\nl5','l1\n‸l5','3dd removes three lines from the cursor down'],
+'edit::gv':['you deselected by accident…','«the same selection is back»','gv restores the previous visual selection exactly'],
+'edit::gUiw':['let ma‸xSize = 1;','let «MAXSIZE» = 1;','gUiw uppercases the word; guiw lowercases it'],
+'edit::ddp / ddkP':['alpha\n‸beta\ngamma','alpha\ngamma\n«beta»','ddp swaps the current line with the one below'],
+'edit::gqip':['a very long paragraph running well past the eightieth column and onward…','a very long paragraph running well past the\n«eightieth column and onward…»','gqip rewraps the paragraph to textwidth'],
+'edit::"0p':['you yanked X, then deleted Y, then pressed p → Y','«X»','"0 retains the last yank regardless of intervening deletes'],
+'registers::"ayy / "ap':['let a = 1;‸','… later, elsewhere:\n«let a = 1;»','"ayy parks a line in register a until you want it'],
+'registers::"+y / "+p':['selected text in Vim','«pasted into your browser»','the + register is the real system clipboard'],
+'registers::"_dd':['deleting a line normally clobbers the paste register','«"_dd throws it away instead»','the black-hole register: deletes without altering any other register'],
+'registers::<C-r>a  (insert)':['-- INSERT --  value = ‸','-- INSERT --  value = «yanked_text»‸','<C-r>a pastes register a without leaving insert mode'],
+'search::/pattern  ?pattern':['one two three ‸four two','one two three four «two»','/two jumps to the next match and highlights the rest'],
+'search::n / N':['«two» … two … two','two … «two» … two','n steps to the next match, N back to the previous'],
+'search::<C-r><C-w> in search':['cursor on ‸accountId','/«accountId»','pull the word under the cursor into the search line'],
+'search::\\v':['pattern: \\(foo\\|bar\\)\\+','pattern: «\\v(foo|bar)+»','very magic — regex that reads like every other language'],
+'search::\\<word\\>':['cat category concat','«cat» category concat','word boundaries stop \'cat\' matching inside \'category\''],
+'search:::s/old/new/':['foo bar foo baz','«new» bar foo baz','one line, first match only'],
+'search:::s/old/new/g':['foo bar foo baz','«new» bar «new» baz','g = every match on this line'],
+'search:::%s/old/new/g':['foo\nbar foo\nfoo','«new»\nbar «new»\n«new»','% = the whole file'],
+'search:::%s/old/new/gc':['foo bar foo','replace with new (y/n/a/q/l/^E/^Y)?','c prompts before each replacement; recommended for large substitutions'],
+'search:::5,20s/old/new/g':['lines 1–4 untouched\n«lines 5–20 changed»\nlines 21+ untouched','','any range works: 5,20 / .,+10 / \'<,\'> / %'],
+'search:::\'<,\'>s/old/new/g':['select the block in V, then :s','«only the selection is rewritten»','Vim inserts \'<,\'> for you when you type : in visual mode'],
+'search:::%s//new/g':['you just searched /error','«:%s//warn/g» reuses that pattern','empty pattern = whatever you last searched for'],
+'search:::%s/\\s\\+$//e':['let x = 42;····\ndone··','let x = 42;\ndone','strips trailing whitespace everywhere; e ignores \'no match\''],
+'search:::sort  /  :sort!  /  :sort u':['pear\napple\npear\nfig','apple\nfig\npear','(:sort u — sorted and de-duplicated in one pass)'],
+'search:::sort n  /  :sort /pat/':['item 10\nitem 9\nitem 100','item 9\nitem 10\nitem 100','n sorts numerically, so 9 comes before 10'],
+'search:::%!sort -u':['c\na\nc\nb','a\nb\nc','pipe the buffer through any shell tool and keep the output'],
+'global:::g/pat/d':['keep this\nTODO remove\nkeep that\nTODO also','keep this\nkeep that','delete every line matching the pattern'],
+'global:::v/pat/d   (or :g!)':['ERROR disk full\ninfo ok\nERROR timeout','ERROR disk full\nERROR timeout','keep only the matching lines — an in-buffer grep'],
+'global:::g/^$/d':['alpha\n\n\nbeta\n\ngamma','alpha\nbeta\ngamma','squeeze out every blank line'],
+'global:::g/pat/s/a/b/g':['url = http://a\nname = a\nurl = http://a','url = «https»://a\nname = a\nurl = «https»://a','substitute only on the lines that match'],
+'global:::%normal! I# ':['alpha\nbeta','«# »alpha\n«# »beta','run Normal-mode keys on every line — instant block comment'],
+'global:::%!python3 -m json.tool':['{"a":1,"b":[2,3]}','{\n    "a": 1,\n    "b": [2, 3]\n}','filter the whole buffer through an external program'],
+'global:::r !ls -la':['cursor here ‸','cursor here\n«total 24»\n«-rw-r--r-- … notes.txt»','read a command\'s output straight into the buffer'],
+'global:::r file.txt':['line A‸\nline B','line A\n«contents of file.txt»\nline B','read another file in below the cursor'],
+'insert::<C-w>':['-- INSERT --  path = /usr/local/bi‸','-- INSERT --  path = /usr/local/‸','<C-w> rubs out the word you just typed'],
+'insert::<C-u>':['-- INSERT --  let total = price * qt‸','-- INSERT --  ‸','<C-u> clears everything before the cursor on the line'],
+'insert::<C-t> / <C-d>':['-- INSERT --  ‸return true;','-- INSERT --  «    »return true;','<C-t> indents the line without leaving insert'],
+'insert::<C-o>{cmd}':['-- INSERT --  value = 4‸2;','-- INSERT --  value = 42;‸','<C-o>$ — one Normal command (jump to line end), then carry on typing'],
+'insert::<C-r>{reg}':['-- INSERT --  name = ‸','-- INSERT --  name = «"bob"»‸','<C-r>0 pastes your last yank mid-typing'],
+'insert::<C-r>=':['-- INSERT --  total = ‸','-- INSERT --  total = «1440»','<C-r>=24*60<CR> — Vim as a calculator'],
+'insert::<C-n> / <C-p>':['-- INSERT --  calculateSub‸','-- INSERT --  calculateSub«totalAmount»','completes from words already in your buffers'],
+'insert::<C-x><C-f>':['-- INSERT --  src/comp‸','-- INSERT --  src/comp«onents/Button.tsx»','file-path completion, straight from the filesystem'],
+'visual::v / V / <C-v>':['alpha\nbeta\ngamma','«alpha»\n«beta»\ngamma','V grabs whole lines; j extends the selection down'],
+'visual::aw / ip / i{ …':['fn(a‸rg, x)','fn(«arg, x»)','vi( — text objects work as selections too'],
+'visual::> / <':['«if (x) {»\n«  do();»\n«}»','«    if (x) {»\n«      do();»\n«    }»','> indents the selection; gv reselects it to go again'],
+'visual::y / d / c':['the «quick brown» fox','the ‸ fox','d removes the selection; c replaces it; y copies it'],
+'visual::<C-v> then I{text}<Esc>':['alpha\nbeta\ngamma','«# »alpha\n«# »beta\n«# »gamma','block-select the first column, I# <Esc> comments all three'],
+'visual::<C-v>$A':['a = 1\nbb = 22\nccc = 333','a = 1«;»\nbb = 22«;»\nccc = 333«;»','$ makes the block ragged-aware, A appends to every line'],
+'files::<C-^>':['editing main.py …','«back to test_main.py»','the quickest way to alternate between two files'],
+'files:::ls  /  :buffers':['','  1 %a  main.py     line 42\n  2 #h  test.py     line 7\n  3  h  README.md   line 1','% = current, # = alternate (<C-^> goes there), h = hidden'],
+'files:::b {n} / :b name':[':b tes‸',':b «test_main.py»','partial names work — :b tes is usually enough'],
+'files::%  %:h  %:t  %:r  %:e':['file: src/app/main.py','% → src/app/main.py\n%:h → src/app\n%:t → main.py\n%:r → src/app/main\n%:e → py','these expand inside any : command, e.g. :!python %'],
+'windows::<C-w>s  /  :sp':['┌───────────┐\n│  main.py  │\n└───────────┘','┌───────────┐\n│  main.py  │\n├───────────┤\n│  main.py  │\n└───────────┘','a horizontal split — same file, two viewports'],
+'windows::<C-w>v  /  :vs':['┌───────────┐\n│  main.py  │\n└───────────┘','┌─────┬─────┐\n│ main│ main│\n└─────┴─────┘','vertical split — the usual choice for code'],
+'windows::<C-w>h j k l':['┌─────┬─────┐\n│ ‸   │     │\n└─────┴─────┘','┌─────┬─────┐\n│     │ ‸   │\n└─────┴─────┘','<C-w>l moves to the window on the right'],
+'windows::<C-w>o':['┌─────┬─────┐\n│ ‸   │     │\n├─────┴─────┤\n│           │\n└───────────┘','┌───────────┐\n│    ‸      │\n└───────────┘','\'only\' — closes every window except this one'],
+'windows::<C-w>H J K L':['┌─────┬─────┐\n│  ‸  │     │\n└─────┴─────┘','┌───────────┐\n│     ‸     │\n├───────────┤\n│           │\n└───────────┘','capital J throws the window to the bottom, full width'],
+'windows::gt / gT  /  {n}gt':['[main.py] [test.py‸] [README]','[main.py] [test.py] [README‸]','gt walks tabs forward, gT back, 2gt jumps to tab 2'],
+'marks::m{a-z}':['line 400: ‸the bug','(mark \'a\' set here, invisibly)','ma costs nothing and lasts the whole session'],
+'marks::`a  /  \'a':['…2000 lines away…','line 400: ‸the bug','`a restores the exact column; \'a moves to the start of the line'],
+'marks::`` ':['jumped to the end with G','«back where you were»','`` toggles between here and your last jump'],
+'marks::<C-o> / <C-i>':['file A → file B → file C‸','file A → file B‸ → file C','<C-o> is the back button, and it crosses files'],
+'macros::q{a-z}':['qa   (recording @a)','…every keystroke is being saved…','start recording into register a'],
+'macros::@a':['one\ntwo\nthree','«"one",»\ntwo\nthree','one run of the macro — quote and comma a line'],
+'macros::{n}@a':['«"one",»\ntwo\nthree\nfour','«"one",»\n«"two",»\n«"three",»\n«"four",»','3@a repeats it over the remaining lines'],
+'macros::100@a':['…40 lines to convert, count unknown…','«all 40 converted, then it stops»','an over-count is deliberate: the macro stops when it can no longer run'],
+'undo::{n}u':['v4 (current)','«v1» — three changes rewound','3u undoes three changes at once'],
+'undo::g- / g+':['undo branch A (lost with plain u)','«g- walks real time, across branches»','when u and <C-r> lose an edit, g- finds it'],
+'codenav::<C-]>  /  g<C-]>':['    total = calcSub‸total(x)','def «calcSubtotal»(x):\n    …  (in the file that defines it)','jump to the definition under the cursor — needs a tags file'],
+'codenav::<C-t>':['…now deep in utils.py…','«back at the call site»','the tag stack — <C-]> in, <C-t> out'],
+'codenav:::make':['src/app.py:42: undefined name \'x\'','quickfix ▸ 1 of 3 errors\n«app.py|42| undefined name \'x\'»',':cn walks the errors, jumping to each one'],
+'codenav:::cn / :cp':['quickfix: «error 1», error 2, error 3','quickfix: error 1, «error 2», error 3','step through the error list without touching the mouse'],
+'codenav:::vimgrep /pat/ **/*.py':['search TODO across the tree','«app.py|12| # TODO drop this»\n«util.py|88| # TODO retry»','results land in the quickfix list, ready for :cn'],
+'codenav:::cdo s/a/b/ge | update':['3 files matched in quickfix','«all 3 rewritten and saved»','project-wide replace done properly: grep → quickfix → :cdo'],
+'codenav::gf  /  <C-w>f':['from ./li‸b/parse import x','«opens lib/parse.py»','gf opens the file name under the cursor'],
+'codenav::K':['result = str‸ftime(fmt)','STRFTIME(3)  Linux Programmer\'s Manual…','K reads the man page for the word under the cursor'],
+'fold::za / zA':['def parse(x):\n    a = 1\n    return a','def parse(x): «+--  2 lines ----»','za toggles the fold under the cursor open and shut'],
+'fold::zR / zM':['«+-- 12 lines» \n«+--  8 lines»','def parse(x):\n    a = 1\n    …','zR opens every fold, zM closes every fold'],
+'fold:::set foldmethod=indent':['flat 400-line file','«+-- class Parser (120 lines)»\n«+-- class Writer (80 lines)»','instant structure on any indented file'],
+'diff::]c / [c':['┌──────┬──────┐\n│ a.py │ b.py │\n│ ~~~~ │ ++++ │\n└──────┴──────┘','«cursor on the next differing hunk»',']c and [c walk the differences'],
+'diff::do  /  :diffget':['left: x = 1   │  right: «x = 2»','left: «x = 2» │  right: x = 2','do \'obtains\' the other side\'s version into this window'],
+'diff::dp  /  :diffput':['left: «x = 1» │  right: x = 2','left: x = 1   │  right: «x = 1»','dp pushes your version across'],
+'terminal:::!cmd':[':!pytest -q','....F                     [100%]\nPress ENTER or type command to continue','run one shell command without leaving Vim'],
+'terminal:::term  /  :terminal':['┌───────────┐\n│  main.py  │\n└───────────┘','┌───────────┐\n│  main.py  │\n├───────────┤\n│ $ pytest  │\n└───────────┘','a real shell in a Vim window; <C-w>N to scroll it'],
+'terminal::<C-z>':['editing in Vim','$ ‸   (Vim suspended)','<C-z> drops to the shell; fg brings Vim back, untouched'],
+'format:::set expandtab':['→   indented with a TAB','····indented with spaces','new indentation becomes spaces; :retab converts what\'s there'],
+'format::gq / gw':['one very long line that runs past your textwidth and keeps going and going','one very long line that runs past your\n«textwidth and keeps going and going»','gqip rewraps a paragraph to textwidth'],
+'format:::set list listchars=tab:▸\\ ,trail:·':['let x = 42;   ','let x = «42;»«···»','makes invisible tabs and trailing spaces visible'],
+'cmdline::<C-r><C-w>':['cursor on ‸userId, then type :%s/',':%s/«userId»/','pull the word under the cursor into the command line'],
+'cmdline::q: / q/ / q?':[':%s/old/new/g   (typed wrong)','«an editable window of your command history»','the command line as an editable buffer; <CR> executes the line'],
+'cmdline::<Up> / <Down>':[':s/f‸',':s/«foo/bar/g»   ← your last matching command','history filtered by what you have already typed'],
+'cmdline::<Tab> / <C-d>':[':e src/ma‸',':e src/«main.py»','completion; <C-d> lists all candidates instead'],
+'cmdline::|':[':w | bd','«write, then close the buffer»','chain Ex commands with a bar'],
+'sysadmin:::w !sudo tee % >/dev/null':['E45: \'readonly\' option is set','«"/etc/hosts" 42L written»','the save you needed after forgetting sudo'],
+'sysadmin::vim -u NONE -N file':['plugins misbehaving?','«bare Vim: no vimrc, no plugins»','the first step when diagnosing a configuration problem'],
+'sysadmin:::set ff=unix | :w':['line one^M\nline two^M','line one\nline two','strips CRLF endings on write'],
+'sysadmin:::e! ':['a buffer you have mangled','«the file as it is on disk»','throw your changes away and reload'],
+'sysadmin::vim -b file  /  :%!xxd':['binary junk on screen','00000000: 7f45 4c46 0201 0100  .ELF....','hex-edit, then :%!xxd -r before writing'],
+'sysadmin::dmesg | vim -':['$ dmesg | vim -','«the whole log, in a Vim buffer»','pipe any command\'s output straight into Vim'],
+'gems::g<C-a> on a visual block':['1.\n1.\n1.\n1.','1.\n«2».\n«3».\n«4».','block-select the numbers, g<C-a> turns them into a sequence'],
+'gems:::%!column -t':['name age city\nbob 9 hanoi\nalexandra 41 bangkok','name      age city\nbob       9   hanoi\nalexandra 41  bangkok','align ragged columns with one command'],
+'gems::gx':['see https://vim‸.org for docs','«opens vim.org in your browser»','gx follows the URL under the cursor'],
+'edit::xp':['teh','th«e»','x followed by p transposes the two characters'],
+'survival::Esc':['-- INSERT --  let x = 42‸','let x = 4‸2   (Normal mode)','Esc leaves insert; the cursor steps back one column'],
+'survival:::w / :q / :wq / :q!':[':w   write, stay\n:q   quit if clean',':wq  write and quit\n:q!  quit, discard everything','the four you will type ten thousand times'],
+'survival::ZZ / ZQ':['…done editing…','«saved and closed»','ZZ = :wq without the colon; ZQ = :q!'],
+'survival:::h <topic>':[':h ci"','ci"  …  change inside the quotes …\n«the real documentation, in a split»','every entry on this page has a :help page behind it'],
+'survival::<C-g>':['editing src/main.py','"src/main.py" 240 lines --17%--','tells you where you are without opening anything'],
+'motion::<C-o> / <C-i>':['main.py → utils.py → test.py‸','main.py → utils.py‸ → test.py','the browser back button, and it crosses files'],
+'motion::<C-d> / <C-u>':['line 1\n…\nline 20  ‸','line 10\n…\nline 30  ‸','half a screen at a time — easier to follow than a full page'],
+'motion::<C-f> / <C-b>':['page 1 ‸','page 2 ‸','a full screen forward or back'],
+'motion::<C-]>':['    total = calcSub‸total(x)','def «calcSubtotal»(x):','jump to the definition (needs a tags file)'],
+'objects::a{ a} aB':['if (x) {\n  do‸();\n}','if (x) «»','da{ removes the braces and everything in them'],
+'registers:::reg  /  :di':['','""   let x = 42;\n"0   const name = \'x\';\n"a   TODO: fix\n"+   (system clipboard)','see exactly what is in every register before you paste'],
+'registers::"+  /  "*':['"+  the real clipboard (Ctrl-V elsewhere)','"*  the X11 primary selection (middle-click)','on Linux these are two different things'],
+'search:::noh':['«foo» bar «foo» baz «foo»','foo bar foo baz foo','clears the leftover highlighting until your next search'],
+'search:::set hlsearch incsearch ignorecase smartcase':['/Err  →  nothing until you press Enter','/Err  →  «Err»or jumps under the cursor as you type','incsearch previews; smartcase makes /err loose and /Err exact'],
+'search::\\c / \\C':['/error\\c','matches «Error», «ERROR», «error»','force case-insensitivity for one search, whatever your settings'],
+'search:::%s/old/new/gi':['Foo FOO foo','«new» «new» «new»','i ignores case for this one substitution'],
+'global:::.,+5':['line 10 ‸\nlines 11–15\nline 16','«lines 10–15 affected»','a range relative to the cursor: :.,+5s/a/b/g'],
+'global:::1,$   or  :%':['the entire file','«every line, first to last»',':% is what you want in front of most :s commands'],
+'global:::.,$':['line 40 ‸\n…\nend of file','«from the cursor to the end»','handy for :.,$d — truncate the file here'],
+'insert::<C-h>':['-- INSERT --  valu‸e','-- INSERT --  val‸e','plain backspace, without moving your hand'],
+'insert::<C-x><C-o>':['-- INSERT --  os.pa‸','-- INSERT --  os.«path»  ← menu: path, pardir, pipe…','omni completion — language aware, not just words in the file'],
+'insert:::set paste / :set nopaste':['pasted into a terminal:\n  a\n    b\n      c','  a\n  b\n  c   ← with :set paste','stops auto-indent stair-stepping; better still, use "+p'],
+'visual::gv':['…selection lost after an operation…','«exactly the same block, reselected»','gv after > lets you indent the same block again'],
+'files:::e file':[':e src/ma‸',':e src/«main.py»','<Tab> completes paths as you type'],
+'files:::e!':['a buffer full of mistakes','«the file as it is on disk»','reload, throwing your changes away'],
+'files:::e .':[':e .','netrw ▸ src/  tests/  README.md  main.py','a file browser in the current window'],
+'files:::find name':[':find main.py','«opens it from anywhere under &path»','with :set path+=** you never type a directory again'],
+'files:::bn / :bp / :bf / :bl':['[1 main.py‸] [2 test.py] [3 README]','[1 main.py] [2 test.py‸] [3 README]','walk the buffer list without the mouse'],
+'files:::bd  /  :bd!':['buffers: 1 main 2 test 3 scratch‸','buffers: 1 main 2 test','close one buffer; ! discards unsaved changes'],
+'files:::sav newname':['editing draft.md','«editing final.md» (draft.md untouched on disk)','Save As — the new file becomes the one you are editing'],
+'files:::w newname':['editing draft.md','«copy written to final.md», still editing draft.md','write a copy, keep the original open'],
+'files::vim -p f1 f2':['$ vim -p a.py b.py','[a.py] [b.py]  ← two tabs','-o and -O do horizontal and vertical splits instead'],
+'windows::<C-w>w / <C-w>W':['┌─────┬─────┐\n│ ‸   │     │\n└─────┴─────┘','┌─────┬─────┐\n│     │ ‸   │\n└─────┴─────┘','cycle through windows without naming a direction'],
+'windows::<C-w>c / <C-w>q':['┌─────┬─────┐\n│ ‸   │     │\n└─────┴─────┘','┌───────────┐\n│     ‸     │\n└───────────┘','close this window, keep the buffer loaded'],
+'windows::<C-w>= ':['┌──┬────────┐\n│  │        │\n└──┴────────┘','┌─────┬─────┐\n│     │     │\n└─────┴─────┘','make every window the same size again'],
+'windows::{n}<C-w>+ / -':['┌───────────┐\n│  window   │\n├───────────┤\n│  window   │\n└───────────┘','┌───────────┐\n│  window   │\n│  (taller) │\n├───────────┤\n│  window   │\n└───────────┘','5<C-w>+ grows the current window by five lines'],
+'windows::<C-w>f':['from ./li‸b/parse import x','┌───────────┐\n│ main.py   │\n├───────────┤\n│ lib/parse │\n└───────────┘','open the file under the cursor in a split'],
+'windows:::tabnew / :tabe file':['[main.py‸]','[main.py] [«No Name»‸]','tabs in Vim hold window layouts, not files'],
+'windows:::set splitbelow splitright':[':sp opens above, :vs opens left','«:sp opens below, :vs opens right»','makes splits land where your eyes expect'],
+'macros::q':['qa  …keys…  q','«macro saved in register a»','the second q stops recording'],
+'macros::@@':['@a, then @@, then @@','«replays the last macro each time»','no need to name the register again'],
+'macros::.':['cwX on one line','«.» repeats it wherever you go','for a single change, . is usually preferable to recording a macro'],
+'undo::u / <C-r>':['let x = «99»;','let x = «42»;','u steps back one change; <C-r> steps forward again'],
+'undo:::set undofile undodir=~/.vim/undo':['close the file, reopen it, press u → nothing','«u still walks back through yesterday\'s edits»','undo history is written to disk and restored on reopening'],
+'codenav::ctags -R .':['$ ctags -R .','«tags file written — <C-] works now»','run it in the project root; re-run when the code moves'],
+'codenav:::tag name  /  :tj name':[':tj parse','1 F  parse   src/lexer.py\n2 F  parse   src/json.py','pick between same-named definitions'],
+'codenav:::cw / :copen / :cclose':['…after :make or :grep…','┌───────────┐\n│ code      │\n├───────────┤\n│ app.py|42|│\n└───────────┘','the quickfix window: every hit, one keypress away'],
+'codenav:::grep -rn pat .':[':grep -rn TODO .','«app.py:12: # TODO drop»\n«util.py:88: # TODO retry»','set grepprg=rg\\ --vimgrep to use ripgrep instead'],
+'codenav::gF':['  File "src/app.py", line ‸42','«opens src/app.py at line 42»','gF reads the line number too; gf just opens the file'],
+'codenav:::set path+=**':[':find butt‸   → nothing',':find butt«on/Button.tsx»','makes :find and gf search the whole tree'],
+'fold::zo / zc':['def parse(x): «+--  2 lines --»','def parse(x):\n    a = 1\n    return a','zo opens, zc closes; za toggles'],
+'fold:::set foldmethod=syntax':['a long class file','«+-- def parse() …»\n«+-- def write() …»','folds follow the language\'s own structure'],
+'diff::vim -d a b  /  vimdiff a b':['$ vim -d old.conf new.conf','┌──────┬──────┐\n│ old  │ new  │\n│ ~~~~ │ ++++ │\n└──────┴──────┘','side by side, differences highlighted'],
+'diff:::diffsplit other':['editing config.yml','┌──────┬──────┐\n│config│config│\n│ .yml │ .bak │\n└──────┴──────┘','diff the open file against another one'],
+'terminal:::!!':[':!pytest -q  … then later …',':!!  «runs pytest -q again»','repeat the last shell command'],
+'terminal:::shell  /  :sh':['editing in Vim','$ ‸   (type exit to come back)','a full shell; Vim waits for you'],
+'format:::set tabstop=4 shiftwidth=4 softtabstop=4':['→       eight-wide tab','····    four spaces','>>, << and new indentation all follow shiftwidth'],
+'format:::set autoindent smartindent':['if (x) {\n    do();\n‸','if (x) {\n    do();\n«    »‸','new lines keep (and guess) the indentation'],
+'format:::filetype indent on':['pressing = does nothing useful','«= re-indents by the language\'s real rules»','this is what makes gg=G produce correct indentation'],
+'format:::set textwidth=80':['typing past column 80 keeps going…','typing past column 80 «wraps to a new line»','a hard wrap while you type; gq rewraps what is already there'],
+'format::=':['if (x) {\n‸do();\n}','if (x) {\n«    »do();\n}','gg=G re-indents the entire file'],
+'options:::set number relativenumber':['  let a = 1\n  let b = 2\n  let c = 3','«  1» let a = 1\n«42» let b = 2   ← cursor\n«  1» let c = 3','distance shown both ways, so 5j and d3k become obvious'],
+'options:::set cursorline':['three identical-looking lines','«the line you are on is shaded»','stops you losing the cursor in a wall of code'],
+'options:::set scrolloff=5':['cursor stuck to the bottom edge','«five lines of context always below»','you never edit blind at the screen edge again'],
+'options:::set ignorecase smartcase':['/error → only lowercase hits','/error → «Error, ERROR, error»\n/Error → only «Error»','loose when you type lowercase, exact when you type a capital'],
+'options:::set hlsearch incsearch':['/tot  … nothing until Enter','/tot  → «tot»al jumps under the cursor, all hits shaded','the two search options usually enabled first'],
+'options:::set wildmenu wildmode=longest:full,full':[':e src/<Tab> → one blind guess',':e src/«main.py  test.py  util.py»','a real completion menu on the command line'],
+'options:::set hidden':['E37: No write since last change','«switches away, keeps your edits in memory»','essential once you use more than one buffer'],
+'options:::set mouse=a':['selecting text drags the terminal\'s selection','«Vim itself handles clicks, drags and scrolling»','works inside tmux and over SSH too'],
+'options:::set clipboard=unnamedplus':['y then Ctrl-V elsewhere → nothing','y «then Ctrl-V elsewhere → your text»','makes plain y and p use the system clipboard'],
+'options:::syntax on  /  :syntax off':['def parse(x): return x','«def» parse(x): «return» x','disabling syntax is the most effective fix for slow large files'],
+'options:::set spell spelllang=en_us':['recieve the paramter','«recieve» the «paramter»',']s jumps to the next one, z= suggests fixes'],
+'options:::verbose set opt?':[':verbose set shiftwidth?','  shiftwidth=2\n        Last set from ~/.vim/ftplugin/yaml.vim','the fastest way to find which file changed a setting'],
+'map:::nnoremap / :inoremap / :vnoremap':[':nnoremap <leader>w :w<CR>','«space-w now saves»','nore = non-recursive; use it unless you know why not'],
+'map:::let mapleader=" "':['mappings start with \\ by default','«mappings start with the space bar»','set it before you define any <leader> mapping'],
+'map:::inoremap jk <Esc>':['reaching for Esc in the corner','«jk — back to Normal mode»','a common alternative to reaching for Esc; any unused pair works'],
+'cmdline::<C-f>':[':%s/old/new/g  (long and wrong)','«a full Vim window of your command history»','edit commands with the editor, not with arrow keys'],
+'cmdline::<C-w> / <C-u>':[':e src/lib/utils‸',':e src/lib/‸','the same word/line erasers as insert mode'],
+'cmdline::<C-c> / <Esc>':[':%s/old/ne‸','«command abandoned, nothing ran»','back out of a command line safely'],
+'sysadmin::vim --clean file':['is it my config or is it Vim?','«defaults only: no vimrc, no plugins»','the modern -u NONE -N'],
+'sysadmin::vim -R / view file':['editing a production config by accident','«read-only: W10: changing a readonly file»','open logs and configs this way by habit'],
+'survival::<C-[>':['-- INSERT --  let x = 42‸','let x = 4‸2   (Normal mode)','identical to Esc, without leaving the home row'],
+'survival:::w !sudo tee %':['E45: \'readonly\' option is set','«"/etc/hosts" 42L written»','writes through sudo; say "L" when Vim asks to reload'],
+'survival:::h index':[':h index','|CTRL-A|  add N to the number at or after the cursor\n|CTRL-B|  scroll N screens backwards\n…','every command in every mode, in one searchable file'],
+'survival::<C-c>':['/verylongsearch… (grinding through a huge file)','«interrupted»','also cancels a half-typed command'],
+'survival::g<C-g>':['(a file, or a visual selection)','Col 12  Word 340 of 2,140  Line 42 of 310  Byte 1,203 of 9,870','the built-in word counter'],
+'motion::ge / gE':['the quick br‸own fox','the quic‸k brown fox','ge lands on the END of the previous word'],
+'motion::g_':['    let x = 42;   ‸  (trailing spaces)','    let x = 42;‸','$ would sit on the last space; g_ finds real text'],
+'motion::g0 / g$':['a very long wrapped line that\ncontinues on ‸the screen below','a very long wrapped line that\n‸continues on the screen below','g0 = start of the SCREEN line, not the real line'],
+'motion::gj / gk':['wrapped line part one\npart ‸two of the same line','wrapped line ‸part one\npart two of the same line','gk moves by what you see, not by what is stored'],
+'motion::{n}%':['(a 1000-line file, cursor at the top)','(line ‸500)','50% jumps halfway through the file'],
+'motion::H / M / L':['…top of the screen…\n…middle…\n…bottom‸…','…‸top of the screen…\n…middle…\n…bottom…','H/M/L are relative to the window, not the file'],
+'motion::( / )':['One sentence. Two ‸sentence. Three.','One sentence. Two sentence. ‸Three.',') moves one sentence forward; d) deletes one'],
+'motion::[[ / ]]':['def a():\n    x = ‸1\n\ndef b():','def a():\n    x = 1\n\n‸def b():','jumps between top-level definitions in C-like files'],
+'motion::[{ / ]}':['if (x) {\n    do‸();\n}','if (x) ‸{\n    do();\n}','find the brace that encloses you, however deep'],
+'motion::[( / ])':['fn(a, g(b‸, c), d)','fn(a, g‸(b, c), d)','the same for round brackets'],
+'motion::[m / ]m':['class A {\n  foo() { ‸}\n  bar() { }\n}','class A {\n  foo() { }\n  ‸bar() { }\n}','method-at-a-time navigation'],
+'motion::g* / g#':['cat category ‸concat','cat «cat»egory con«cat»','g* matches inside words too; * would not'],
+'motion::``  /  \'\'':['line 12: ‸working here','(pressed G, then ``)\nline 12: ‸working here','`` toggles you back and forth with your last jump'],
+'motion::g;  /  g,':['edit 1 … edit 2 … edit 3‸','edit 1 … ‸edit 2 … edit 3','g; moves backwards through the change list'],
+'motion::<C-e> / <C-y>':['line 10 ‸\nline 11','line 11 ‸\nline 12','the text scrolls, the cursor stays put'],
+'motion::zh / zl':['a very long unwrapped line… ‸','…the view slides one column right','for :set nowrap files, e.g. wide logs'],
+'motion::zs / ze':['col 200 of a long line, cursor mid-screen','the cursor column is now at the screen edge','horizontal cousin of zt / zb'],
+'motion::|':['let total = price * ‸qty;','‸let total = price * qty;','20| puts you exactly on column 20'],
+'motion::_':['line one ‸\nline two\n    line three','line one\nline two\n    ‸line three','3_ = first non-blank, 2 lines down; d3_ deletes them'],
+'motion::+ / -':['    alpha‸\n    beta','    alpha\n    ‸beta','+ lands on the first non-blank, not column 1'],
+'motion::gm':['a long wrapped line of text here','a long wrapped ‸line of text here','middle of the screen width, regardless of the text'],
+'motion::go':['(a binary or a file you are indexing)','(cursor at byte ‸1024)','1024go — byte-exact positioning'],
+'motion::gd / gD':['def run():\n    total = 0\n    print(‸total)','def run():\n    «total» = 0\n    print(total)','gd finds the local declaration without a tags file'],
+'motion::]s / [s':['recieve the ‸paramter here','recieve the «paramter» here','walks between misspelled words (needs :set spell)'],
+'objects::is / as':['One. Two sen‸tence here. Three.','One. «» Three.','das takes the sentence and its trailing space'],
+'objects::i` / a`':['run `ls -‸la` now','run `«»` now','backtick pairs, same rules as quotes'],
+'objects::i[ i]  /  a[ a]':['arr[ind‸ex + 1]','arr[«»]','di[ empties the subscript'],
+'objects::i< i>  /  a< a>':['Map<Str‸ing, int> m;','Map<«»> m;','handy in generics-heavy code'],
+'objects::it / at':['<p>hello ‸world</p>','<p>«»</p>','dit empties the tag; dat removes the tags as well'],
+'objects::ya{':['if (x) {\n  do‸();\n}','(register now holds the whole block, braces included)','ya{ then p duplicates a block'],
+'objects::dap':['alpha\nbe‸ta\n\ngamma','‸gamma','dap takes the blank line after it too, so no gap is left'],
+'objects::cit':['<title>Old ti‸tle</title>','<title>«New»‸</title>','the HTML twin of ci"'],
+'objects::vi{V':['if (x) {\n  a();\n  b‸();\n}','if (x) {\n«  a();»\n«  b();»\n}','select the contents, then V snaps it to whole lines'],
+'objects::2i{ / 2a{':['if (a) {\n  if (b) {\n    x‸;\n  }\n}','if (a) {\n«»\n}','the count climbs outwards through nested blocks'],
+'objects::gn':['/TODO  then  cgnDONE','«TODO» foo «TODO» bar','cgn changes the next match — then . repeats it, match after match'],
+'objects::gN':['… «TODO» foo ‸TODO','the previous match is selected instead','gN searches backwards'],
+'edit::gp / gP':['«yanked»\nline one‸','line one\nyanked\n‸','gp leaves the cursor after the paste, ready for the next one'],
+'edit::]p':['  if (x) {\n    ‸','  if (x) {\n    «pasted line, re-indented to here»',']p fixes the indent of a paste; p would keep the old one'],
+'edit::~':['‸hello','«H»ello','toggles one character and moves on'],
+'edit::g~{motion} / g~~':['Hello ‸World','Hello «wORLD»','g~w flips the case of the word'],
+'edit::gu{motion} / gU{motion}':['let MA‸X_SIZE = 1;','let «max_size» = 1;','guiw / gUiw are the everyday forms'],
+'edit::g<C-a>':['x = 1\nx = 1\nx = 1','x = 1\nx = «2»\nx = «3»','block-select the column of numbers first'],
+'edit::>{motion} / >ip':['alpha\nbeta\n\ngamma','«    »alpha\n«    »beta\n\ngamma','>ip indents the whole paragraph'],
+'edit::gg=G':['def a():\n  x=1\n     return x','def a():\n«    »x=1\n«    »return x','re-indent the entire file in three keystrokes'],
+'edit::gq{motion} / gqq':['a line that runs far past the configured textwidth and keeps going','a line that runs far past the configured\n«textwidth and keeps going»','gqq wraps just this line; gqip the paragraph'],
+'edit::gw{motion}':['reformatting a paragraph with the cursor in ‸the middle','same text, rewrapped, cursor still ‸there','gw is gq that does not move you'],
+'edit::guu / gUU':['Some Mixed Case Line','«some mixed case line»','whole-line case change'],
+'edit::g?{motion}':['secret message','«frperg zrffntr»','ROT13 is implemented as a built-in operator'],
+'edit::yiwviwp':['let «alpha» = 1;   (alpha yanked)\nlet ‸beta = 2;','let alpha = 1;\nlet «alpha» = 2;','paste over a word; note the register now holds "beta"'],
+'edit::&  /  g&':['(after :s/foo/bar/ on line 1)\nfoo here\nfoo ‸there','foo here\n«bar» there','& repeats the last :s on this line; g& on the whole file'],
+'edit::ga':['the character ‸é','<é>  233,  Hex 00e9,  Oct 351, Digr e\'','tells you exactly which character you are looking at'],
+'edit::g8':['the character ‸é','c3 a9','the raw UTF-8 bytes; useful when diagnosing encoding problems'],
+'edit::<C-o> in insert':['-- INSERT --  value = 4‸2;','-- INSERT --  value = 42;‸','<C-o>$ jumps to the line end and stays in insert'],
+'edit:::m +1  /  :m -2':['alpha\n‸beta\ngamma','alpha\ngamma\n‸beta',':m +1 moves the line down, :m -2 moves it up'],
+'edit:::t . / :co .':['let x = 1;‸','let x = 1;\n«let x = 1;»','duplicate a line without touching any register'],
+'edit:::normal! @q':['(macro q recorded)\n:2,10normal! @q','«lines 2–10 all transformed»','run a macro over an exact range — no counting'],
+'registers::"Ayy':['"ayy on line 1, then "Ayy on line 2','register a: «line 1»\n            «line 2»','the capital letter appends instead of replacing'],
+'registers::"0':['yy on "hello", then dd on another line','"0 still holds «hello»','the yank register is never touched by deletes'],
+'registers::"1 … "9':['dd, dd, dd','"1 = newest delete\n"2 = the one before\n"3 = older still','"1p then . walks back through your deletions'],
+'registers::"-':['dw on a word','"- holds «that word»','deletes smaller than a line land here, not in "1'],
+'registers::"%':['editing src/app/main.py','"%p inserts «src/app/main.py»','the current file name, as text'],
+'registers::"#':['main.py (alternate: test_main.py)','"#p inserts «test_main.py»','the file <C-^> would take you to'],
+'registers::".':['you typed "hello world" in insert mode','".p inserts «hello world»','replay your last insertion as text'],
+'registers::":':['you ran :%s/foo/bar/g','":p inserts «%s/foo/bar/g»','handy for putting a command into a script or a note'],
+'registers::"/':['you searched /error','"/p inserts «error»','the last search pattern, as text'],
+'registers::<C-r><C-p>a':['-- INSERT --  pasting an indented block','«the block, re-indented to fit here»','<C-r><C-p> fixes indentation; <C-r> alone does not'],
+'registers::<C-r>=5*12<CR>':['-- INSERT --  total = ‸','-- INSERT --  total = «60»','a calculator inside insert mode'],
+'registers:::let @a = @b':['register b: «yy dd p»','register a: «yy dd p»','copy a macro to another slot before editing it'],
+'registers:::let @+ = expand("%:p")':['editing src/app/main.py','clipboard now holds «/home/you/proj/src/app/main.py»','paste the full path into a terminal or a ticket'],
+'registers::q:  /  q/':['a long command you typed wrong','«a normal Vim buffer of your history»','edit any past command, press <CR> to run it'],
+'search::/pat/e':['one ‸two three','one tw‸o three','the cursor lands on the LAST character of the match'],
+'search::/pat/+2':['…match on line 10…\n…\n…line 12‸…','cursor lands two lines below the match','offsets work with d and y too'],
+'search:://':['(you searched /error earlier)','//  «repeats it»','also :s//new/ reuses the same pattern'],
+'search::\\V':['searching for  a.b.c  literally','\\Va.b.c matches only «a.b.c»','\\V makes . and friends ordinary characters'],
+'search::\\zs / \\ze':['foo=bar  foo=baz','/foo=\\zs\\w\\+ highlights «bar» and «baz»','match the context, but select only part of it'],
+'search::\\{n,m}':['a aa aaa aaaa','/\\va{2,3} matches «aa» and «aaa»','a bounded repeat'],
+'search::\\(...\\)  →  \\1':['2026-09-23','/\\v(\\d{4})-(\\d2)  →  \\1 is «2026»','capture in the pattern, reuse in the replacement'],
+'search::%(...)':['/\\v%(foo|bar)baz','groups without capturing — keeps \\1 for what matters','the very-magic form of \\%( \\)'],
+'search::\\_s / \\_.':['end of line one\nstart of line two','/one\\_sstart matches «across the newline»','the \\_ prefix lets a pattern span lines'],
+'search::[[:alpha:]] [[:digit:]]':['abc123','/[[:digit:]]\\+ matches «123»','locale-aware classes; also [[:space:]], [[:punct:]]'],
+'search::\\@= \\@! \\@<= \\@<!':['foobar foobaz','/\\vfoo(bar)@! matches the foo in «foobaz» only','lookarounds: assert without consuming'],
+'search:::%s/\\v(\\w+) (\\w+)/\\2 \\1/':['hello world','«world hello»','capture two words, swap them in the replacement'],
+'search:::%s/x/\\=submatch(0)+1/g':['port 8080','port «8081»','\\= makes the replacement an expression'],
+'search:::%s/foo/bar/gn':['foo bar foo baz foo','3 matches on 2 lines','n counts without changing a thing — a safe dry run'],
+'global:::g/pat/normal! A;':['let a = 1\nconst b = 2\n// note','let a = 1«;»\nconst b = 2«;»\n// note','append to matching lines only'],
+'global:::g/pat/t$':['ERROR one\ninfo\nERROR two','ERROR one\ninfo\nERROR two\n«ERROR one»\n«ERROR two»','gather all matches at the end of the file'],
+'global:::g/pat/m0':['a\nERROR x\nb\nERROR y','«ERROR y»\n«ERROR x»\na\nb','moves matches to the top — note the reversed order'],
+'global:::g/pat/ .,+3d':['HEADER\nl1\nl2\nl3\nkeep','keep','delete each match plus the three lines after it'],
+'global:::g/pat/y A':['TODO one\nx\nTODO two','register a: «TODO one»\n            «TODO two»','harvest matching lines into a register (clear it with qaq first)'],
+'global:::\'<,\'>normal! @q':['(five lines selected, macro q recorded)','«all five transformed»','the reliable way to run a macro on a selection'],
+'global:::\'a,\'b':['ma … 40 lines … mb',':\'a,\'bd  «deletes exactly that span»','marks make ranges you can see'],
+'global:::/start/,/end/':['BEGIN\n  body\nEND',':/BEGIN/,/END/d  «removes the whole block»','ranges can be patterns, not just numbers'],
+'global:::g/pat/z#.5':[':g/ERROR/z#.5','  40 …context…\n  42 ERROR disk full\n  44 …context…','grep with context, inside Vim'],
+'global:::.!date':['(cursor on an empty line)','«Wed 23 Sep 2026 12:04:11 +07»','replace this line with a command\'s output'],
+'global:::w >> other.txt':['editing notes.md','«appended to other.txt»','append instead of overwrite; ranges work too'],
+'insert::<C-a>':['-- INSERT --  ‸','-- INSERT --  «the text you typed last time»','repeat an insertion without retyping it'],
+'insert::<C-@>':['-- INSERT --  ‸','«last inserted text»‸  (back in Normal mode)','<C-a> plus Esc in one key'],
+'insert::<C-v>065':['-- INSERT --  ‸','-- INSERT --  «A»','decimal codes; <C-v>u00e9 gives é'],
+'insert::<C-v><Tab>':['(expandtab is on, Tab gives spaces)','-- INSERT --  «→» a real tab','the escape hatch for Makefiles'],
+'insert::<C-k>a:':['-- INSERT --  caf‸','-- INSERT --  caf«é»','<C-k>-> gives →, <C-k>Eu gives €, <C-k>12 gives ½'],
+'insert::<C-x><C-l>':['-- INSERT --  if err != ‸','-- INSERT --  if err != «nil { return err }»','completes a whole line from elsewhere in your buffers'],
+'insert::<C-x><C-]>':['-- INSERT --  calcSub‸','-- INSERT --  calcSub«total»','completion straight from the tags file'],
+'insert::<C-x><C-k>':['-- INSERT --  albe‸','-- INSERT --  albe«it»','needs :set dictionary=/usr/share/dict/words'],
+'insert::<C-x><C-s>':['-- INSERT --  recieve‸','-- INSERT --  «receive»','fix a typo without leaving insert mode'],
+'insert::<C-x><C-v>':['-- INSERT --  :set expand‸','-- INSERT --  :set expand«tab»','completes Vim commands — useful when writing a vimrc'],
+'insert::<C-e> / <C-y>':['-- INSERT --  a completion menu is open','<C-y> «accepts» · <C-e> «cancels and keeps what you typed»','the two keys that control an open completion popup'],
+'insert::<C-y>':['const alpha = 1;\n-- INSERT --  ‸','const alpha = 1;\n-- INSERT --  «c»','copies the character directly above, one at a time'],
+'insert::<C-g>u':['typing a long sentence in one insert','u now stops «at the break» instead of undoing it all','inserted into mappings to get sane undo granularity'],
+'insert::<C-]>':['-- INSERT --  teh‸  (with :iabbrev teh the)','-- INSERT --  «the»','forces an abbreviation to expand right now'],
+'visual::o':['the «quick brown»‸ fox','the ‸«quick brown» fox','jump to the other end to extend the selection backwards'],
+'visual::O':['block selection, cursor bottom-right','cursor now bottom-left','O swaps corners horizontally in block mode'],
+'visual::<C-v> then A{text}<Esc>':['a = 1\nb = 2\nc = 3','a = 1«;»\nb = 2«;»\nc = 3«;»','append the same text to every line of the block'],
+'visual::<C-v> then c':['id_one\nid_two\nid_three','«key»_one\n«key»_two\n«key»_three','change a column on every line at once'],
+'visual::<C-v> then r{c}':['abc\nabc\nabc','«xxx»\n«xxx»\nabc','fill the whole block with one character'],
+'visual::<C-v> then d / x':['01 alpha\n02 beta\n03 gamma','alpha\nbeta\ngamma','delete a rectangle — strip a leading column'],
+'visual::= ':['«if (x) {»\n«do();»\n«}»','if (x) {\n«    »do();\n}','re-indent exactly what you selected'],
+'visual::u / U / ~':['the «quick brown» fox','the «QUICK BROWN» fox','U upper, u lower, ~ toggles'],
+'visual::J / gq':['«one»\n«two»\n«three»','one two three','J joins the selected lines into one'],
+'visual:::\'<,\'>!sort':['«pear»\n«apple»\n«fig»','apple\nfig\npear','pipe only the selection through a shell command'],
+'visual::p':['the «quick» fox   (register: slow)','the «slow» fox','pasting over a selection replaces it'],
+'visual::g<C-a>':['1.\n1.\n1.','1.\n«2».\n«3».','numbers a list in one stroke'],
+'visual::<C-g>':['«selected text» (Visual mode)','«selected text» (Select mode)','typing now replaces the selection, like a GUI editor'],
+'files:::%bd|e#':['buffers: 1 main  2 test  3 scratch  4 notes','buffers: «1 main»','reduces a cluttered session to the current file'],
+'files:::args *.py':[':args src/*.py','[src/a.py] src/b.py src/c.py','sets the list :argdo and :n work through'],
+'files:::argdo %s/a/b/ge | update':[':args *.py  then  :argdo %s/foo/bar/ge | update','«every matching file rewritten and saved»','e ignores files with no match; update writes only if changed'],
+'files:::bufdo %s/a/b/ge | update':['(12 buffers open)','«all 12 rewritten and saved»','the same across open buffers rather than the arglist'],
+'files:::n / :prev':['[a.py] b.py c.py','a.py [b.py] c.py','walk the argument list'],
+'files:::browse oldfiles':[':browse oldfiles','1: ~/src/main.py\n2: ~/notes.md\n3: /etc/hosts\nType number and <Enter>','your recent files, from viminfo'],
+'files:::\'a,\'b w part.txt':['ma … 200 lines … mb','«those 200 lines written to part.txt»','carve a chunk out of a file'],
+'files:::cd / :lcd / :pwd':[':pwd → /home/you',':lcd src  →  «this window only»',':cd changes it everywhere, :lcd just here'],
+'files:::set autochdir':['open src/app/main.py, :pwd is still ~','open src/app/main.py, :pwd becomes «src/app»','handy with gf and :e, confusing with :make'],
+'files:::set autoread':['file changed by git checkout','«Vim quietly reloads it»','pairs well with :checktime'],
+'files:::checktime':['(file changed outside Vim)','W11: Warning: File "main.py" has changed since editing started','forces the check right now'],
+'files::vim -R / view':['$ view /etc/nginx/nginx.conf','«read-only — W10 if you try to change it»','recommended for logs and production configuration files'],
+'files::vim + file  /  vim +42 file':['$ vim +42 main.py','(opens at line ‸42)','vim + alone opens at the last line'],
+'files::vim +/pattern file':['$ vim +/ERROR app.log','(opens at the first «ERROR»)','jump straight to what you came for'],
+'files::vim -d a b':['$ vim -d a.conf b.conf','┌──────┬──────┐\n│ a.conf│b.conf│\n└──────┴──────┘','the same as vimdiff'],
+'windows::<C-w>n / <C-w>^':['┌───────────┐\n│  main.py  │\n└───────────┘','┌───────────┐\n│ [No Name] │\n├───────────┤\n│  main.py  │\n└───────────┘','<C-w>^ splits with the alternate file instead'],
+'windows::<C-w>p':['window A → window B‸','window ‸A','back to whichever window you were in before'],
+'windows::<C-w>T':['┌─────┬─────┐\n│ main│ test│\n└─────┴─────┘','[main.py] [«test.py»]','pull a split out into its own tab'],
+'windows::<C-w>x / <C-w>r':['┌─────┬─────┐\n│  A  │  B  │\n└─────┴─────┘','┌─────┬─────┐\n│  B  │  A  │\n└─────┴─────┘','swap two windows without closing anything'],
+'windows::<C-w>_ / <C-w>|':['┌───────────┐\n│     A     │\n├───────────┤\n│     B     │\n└───────────┘','┌───────────┐\n│           │\n│     A     │\n│           │\n├───────────┤\n│  B (1 ln) │\n└───────────┘','maximise this window; <C-w>= restores the balance'],
+'windows::{n}<C-w>< / >':['┌────┬────────┐\n│ A  │   B    │\n└────┴────────┘','┌────────┬────┐\n│   A    │ B  │\n└────────┴────┘','10<C-w>> widens the current window by ten columns'],
+'windows::<C-w>]  /  <C-w>}':['    total = calcSub‸total(x)','┌───────────┐\n│ main.py   │\n├───────────┤\n│ def calcSubtotal│\n└───────────┘','see a definition without losing your place'],
+'windows::<C-w>gf':['import ./li‸b/parse','[main.py] [«lib/parse.py»]','open the file under the cursor in a new tab'],
+'windows:::tabc / :tabo':['[a] [b‸] [c]',':tabo → [«b»]','close this tab, or everything except it'],
+'windows:::tabmove {n}':['[a] [b] [c‸]','[a] [«c»] [b]',':tabmove 1 puts this tab second'],
+'windows:::tabdo {cmd}':[':tabdo set number','«line numbers on in every tab»','tab-wide batch command'],
+'windows:::windo {cmd}':[':windo diffthis','«every window joins the diff»','window-wide batch command'],
+'marks::m{A-Z}':['mT in test_main.py','`T «jumps to that file and line», from anywhere','capital marks cross files and survive restarts'],
+'marks::`. / `^':['(you edited line 40, then wandered off)','`. → «line 40, exact column»','`^ goes where insert mode last ended'],
+'marks::`[ / `]':['you just pasted a block','`[ = «start» of it,  `] = «end» of it','v`] selects exactly what you pasted'],
+'marks::`< / `>':['(a selection you made earlier)','`< = its start,  `> = its end',':\'<,\'> is built from these two'],
+'marks:::marks':[':marks',' mark line  col file/text\n  a    42    4 let total = 0\n  \'   120    0 def main():','everything you have marked, in one list'],
+'marks:::delmarks a b  /  :delmarks!':['marks: a b c','marks: «c»','!, clears all lowercase marks in this buffer'],
+'marks::d\'a  /  y`a':['ma … 30 lines … cursor here','d\'a «deletes the whole span»','operators accept marks as motions'],
+'marks:::jumps':[':jumps',' jump line  file/text\n   2    12  src/main.py\n   1    88  src/util.py\n>  0    42  src/app.py','<C-o> and <C-i> walk this list'],
+'marks:::changes':[':changes',' change line  col text\n     2   42    4 let total = 0\n     1   88    0 def main():','g; and g, walk this list'],
+'marks::g; / g,':['edit A … edit B … edit C‸','edit A … ‸edit B … edit C','moves through the change list in order'],
+'marks::\'"':['(reopening a file you closed yesterday)','«cursor back where you left it»','add an autocmd for it and Vim always resumes where you stopped'],
+'macros::qA':['register a: «I# <Esc>»','register a: «I# <Esc>j»','capital letter appends to an existing macro'],
+'macros:::let @a=\'...\'':['"ap → I# <Esc>  (pasted, and wrong)','"ayy → «register a fixed by hand»','edit macros as ordinary text, then yank them back'],
+'macros:::%normal! @a':['100 lines to convert','«all 100 converted»','no counting, no over-running the end of the file'],
+'macros:::g/pat/normal! @a':['(mixed file)','«only the matching lines transformed»','macro + :g is the most powerful pair in Vim'],
+'macros::<C-v> selection + :\'<,\'>normal! @a':['(select the lines you want first)','«exactly those lines transformed»','safest form: you can see the range before you run it'],
+'macros::qaqqa…q':['(register a holds an old macro)','qaq «empties it», then qa…q records cleanly','the idiom for starting a macro from scratch'],
+'macros::{n}.':['change made once','5. «repeats it five more times»','the count applies to the repeat, not the original'],
+'undo::U':['let x = 1;  → edited 4 times on this line','let x = «1»;  (as it was)','U undoes the whole line at once; U again redoes it'],
+'undo:::earlier 10m  /  :later 5m':['(a bad hour of edits)','«the file as it was ten minutes ago»','time travel, not change-count travel'],
+'undo:::earlier 3f':['(several saves ago)','«the file as it was three writes back»','f counts file writes'],
+'undo:::undolist':[':undolist','number changes  when         saved\n     3       3  10:02:14\n     5       4  10:05:41','branches appear when you undo and then type again'],
+'undo:::undo {n}':[':undo 5','«jump straight to undo state 5»','reach a branch that u and <C-r> cannot'],
+'undo:::set undolevels=1000':['default is already 1000','«how many changes are kept in memory»','set it to -1 to disable undo in a huge file'],
+'codenav:::tn / :tp / :ts':[':ts parse','1 F  parse  src/lexer.py\n2 F  parse  src/json.py\nType number and <Enter>','when one name has several definitions'],
+'codenav:::tags':[':tags','  # TO tag     FROM line  in file\n  1  1 calcTotal        42  src/app.py','the breadcrumb trail <C-t> walks back'],
+'codenav::<C-w>}':['    x = calcSub‸total()','┌───────────┐\n│ (preview) │\n│ def calcSubtotal│\n├───────────┤\n│  main.py  │\n└───────────┘','peek at a definition without leaving the file'],
+'codenav:::pc / :pclose':['(preview window open)','«closed»','the tidy-up after <C-w>} or :ptag'],
+'codenav:::ptag name':[':ptag calcSubtotal','(definition appears in the preview window)','like :tag, but without moving you'],
+'codenav:::set tags=./tags;,tags':['editing src/deep/nested/file.py','«finds the tags file at the project root»','the trailing ; means "search upwards"'],
+'codenav:::cc {n}':['quickfix: 1 … 2 … 3',':cc 2  «jumps to error 2»','jump to an error by number'],
+'codenav:::cfirst / :clast':['quickfix: «err 1» … err 7','«back to the first error»','after wandering off, get back to the start of the list'],
+'codenav:::cnf / :cpf':['errors in app.py, util.py, db.py',':cnf «jumps to the first error in util.py»','skips the remaining errors in the current file'],
+'codenav:::cdo {cmd}  /  :cfdo {cmd}':[':cdo normal! A// FIXME','«appended to every quickfix line»',':cdo runs per entry, :cfdo once per file'],
+'codenav:::vimgrep /pat/j %':[':vimgrep /TODO/j %','(quickfix filled, «cursor stays put»)','j = do not jump to the first match'],
+'codenav:::lvimgrep / :lopen / :lne':['(two windows, two different searches)','«each window keeps its own result list»','location lists are quickfix, scoped per window'],
+'codenav:::cexpr system(\'rg --vimgrep pat\')':[':cexpr system("rg --vimgrep TODO")','«ripgrep results in the quickfix list»','pull any tool\'s output into quickfix'],
+'codenav:::set errorformat=…':['my_linter: line 42: something wrong','«app.py|42| something wrong»','teach quickfix to parse a tool it does not know'],
+'codenav::[I  /  [i':['cursor on ‸MAX_SIZE','  1:   12  #define MAX_SIZE 1024\n  2:   88      if (n > MAX_SIZE)','every mention of the word, with line numbers'],
+'codenav::[<C-i>':['cursor on ‸MAX_SIZE','«jumps to the first of those lines»','the jump version of [I'],
+'codenav::[D / [d':['cursor on ‸MAX_SIZE','  1:   12  #define MAX_SIZE 1024','the same, restricted to #define lines'],
+'fold::zf{motion}':['alpha\nbeta\ngamma\ndelta','«+--  3 lines ----»\ndelta','zf2j folds the next three lines (foldmethod=manual)'],
+'fold::zf%':['if (x) {\n  ‸a();\n  b();\n}','if (x) «+--  2 lines --»','fold a brace block by its brackets'],
+'fold::zO / zC':['«+-- outer»  (folds nested inside)','def a():\n    def b():\n        …','capital = recursive, through every level'],
+'fold::zr / zm':['«+-- class» (all nested folds closed)','class A:\n  «+-- def a()»\n  «+-- def b()»','zr opens one level at a time; zm closes one'],
+'fold::zd / zD / zE':['(manual folds you no longer want)','«fold removed, text untouched»','zE deletes every fold in the window'],
+'fold::zj / zk':['«+-- fold A»\ntext\n«+-- fold B»','«+-- fold A»\ntext\n‸«+-- fold B»','move between folds without opening them'],
+'fold::[z / ]z':['def a():\n    x = ‸1\n    return x','‸def a():\n    x = 1\n    return x','jump to the edges of the fold you are inside'],
+'fold:::set foldmethod=marker':['section one  {{{\n  body\n}}}','«+--  3 lines: section one ----»','explicit folds you commit to the file — common in vimrcs'],
+'fold:::set foldmethod=expr':[':set foldexpr=getline(v:lnum)=~"^#"','«fold on your own rule»','with nvim_treesitter this gives real syntax folds'],
+'fold:::set foldlevel=1  /  foldlevelstart':['file opens fully folded','«opens with the top level showing»','foldlevelstart applies to every new file'],
+'fold:::set foldcolumn=2':['def parse():','«▾ »def parse():','a clickable fold indicator in the gutter'],
+'fold:::%foldopen!':['«+-- 12 lines»\n«+--  8 lines»','(everything visible)','like zR, but as an Ex command over a range'],
+'diff:::diffthis':['two ordinary windows','«both now diffed and highlighted»','run it in each window you want compared'],
+'diff:::diffoff  /  :diffoff!':['(diff mode, wrap and folds changed)','«normal editing restored»','! turns it off in every window at once'],
+'diff:::diffupdate':['(you edited, highlights look stale)','«differences recalculated»','also :diffu'],
+'diff:::set diffopt+=iwhite':['a = 1   vs   a  =  1  → shown as different','«treated as identical»','ignore whitespace-only changes'],
+'diff:::set diffopt+=vertical':['┌───────────┐\n│    a      │\n├───────────┤\n│    b      │\n└───────────┘','┌─────┬─────┐\n│  a  │  b  │\n└─────┴─────┘','side by side, always'],
+'diff:::w !diff % -':['(unsaved changes)','< let x = 1\n---\n> let x = 2','what have I actually changed since the last save?'],
+'diff:::set scrollbind cursorbind':['two windows scrolling apart','«both scroll together»','for comparing files that are not quite a diff'],
+'terminal:::term ++curwin  /  ++rows=10':[':term  → a new split',':term ++curwin  «takes over this window»','++rows / ++cols size it explicitly'],
+'terminal:::vert term':['┌───────────┐\n│  main.py  │\n└───────────┘','┌─────┬─────┐\n│ main│ $   │\n└─────┴─────┘','a shell beside your code, not under it'],
+'terminal::<C-w>N  or  <C-\\><C-n>':['(terminal, keys go to the shell)','«Normal mode: scroll, search and yank the output»','how you copy a stack trace out of :term'],
+'terminal::i / a':['(terminal in Normal mode)','«back to typing at the shell prompt»','the way back from <C-w>N'],
+'terminal::<C-w>:':['(inside the terminal window)','«:w  runs as a Vim command»','reach Vim without leaving the terminal window'],
+'terminal::<C-w>"a':['(terminal prompt)','$ «contents of register a»','paste a Vim register into the shell'],
+'terminal:::!%:p':['editing ./deploy.sh',':!%:p  «runs this very file»','%:p expands to the full path'],
+'terminal:::!chmod +x %':['-rw-r--r--  deploy.sh','«-rwxr-xr-x  deploy.sh»','the step usually required after writing a new script'],
+'terminal:::term ++close ./run.sh':[':term ++close ./run.sh','(runs, then «the window closes by itself»)','no leftover terminal windows'],
+'format:::retab':['→   →   indented with tabs','········indented with spaces','needs expandtab set; :retab! converts the other way'],
+'format:::set colorcolumn=80':['a line running past column 80','a line running past column «▏» 80','a visual guide, no wrapping'],
+'format:::set wrap linebreak breakindent':['    a long indented line that wraps mid-wo\nrd at the edge','    a long indented line that wraps\n    «at word boundaries, keeping the indent»','makes soft wrapping readable'],
+'format:::set formatoptions-=cro':['// comment\n‸  → Vim types // for you','// comment\n«‸»  (clean line)','disables automatic comment continuation on new lines'],
+'format:::set equalprg=black\\ -q\\ -':['x = {  \'a\' :1}','x = {«"a": 1»}','now gg=G runs your real formatter'],
+'format:::set fileformat=unix':['line one^M\nline two^M','line one\nline two','then :w. :set ff? tells you what you have'],
+'format:::e ++ff=dos':['garbled ^M at every line end','«clean lines»','force the line-ending interpretation when opening'],
+'format:::set fileencoding=utf-8':['(file read as latin1)','«written back as UTF-8»','fenc is what gets written; enc is how Vim works internally'],
+'format:::e ++enc=latin1':['mojibake: caf├⌐','«café»','reopen with the right encoding'],
+'options:::set sidescrolloff=8':['a long line, cursor at the right edge','«eight columns of context always visible»','the horizontal twin of scrolloff'],
+'options:::set wildignore=*.o,*.pyc,node_modules/**':[':find but<Tab> → 40 node_modules hits',':find but<Tab> → «Button.tsx»','keeps generated files out of completion and :find'],
+'options:::set confirm':['E37: No write since last change','Save changes to "main.py"?  [Y]es, (N)o, (C)ancel','a prompt instead of a refusal'],
+'options:::set undofile':['close and reopen, press u → nothing','«undo history still there»','pair with undodir so .un~ files stay out of your project'],
+'options:::set noswapfile / :set directory=~/.vim/swap//':['.main.py.swp littering the repo','«swap files kept in ~/.vim/swap»','the // keeps full paths, so names never collide'],
+'options:::set backupdir=~/.vim/backup//':['main.py~ next to your source','«backups kept in ~/.vim/backup»','same trick as the swap directory'],
+'options:::set lazyredraw':['a macro over 500 lines, screen flickering','«runs several times faster, no flicker»','the screen only redraws when the macro finishes'],
+'options:::set ttyfast':['(slow scrolling over a bad link)','«smoother redraw on a fast connection»','on by default in modern Vim'],
+'options:::set timeoutlen=500 ttimeoutlen=10':['Esc feels sluggish in a terminal','«instant»','ttimeoutlen governs key-code timeout and should be small'],
+'options:::set updatetime=300':['4000 ms before CursorHold fires','«300 ms»','plugins that show diagnostics on hover depend on this'],
+'options:::set signcolumn=yes':['text jumping sideways as git signs appear','«the gutter is always there»','prevents the buffer shifting when signs appear and disappear'],
+'options:::set virtualedit=block':['a = 1\nbb = 22\n  (block selection stops short)','«the block extends past the end of short lines»','for editing ragged columns'],
+'options:::set inccommand=split':[':%s/foo/bar/g  (nothing until <CR>)','«a live preview of every change as you type»','Neovim only'],
+'options:::set shortmess+=I':['VIM - Vi IMproved  version 9.1 …','«straight to an empty buffer»','skips the splash screen'],
+'options:::set laststatus=2':['(status line vanishes with one window)','«always visible»','3 gives one global status line in newer Vim'],
+'options:::set showcmd ruler':['(no feedback while typing d2)','bottom right: «d2»     42,17   58%','see pending commands and your position'],
+'options:::set modeline':['# vim: ts=2 sw=2 et  (in the file)','«those settings applied on open»','handy in shared repos; a security risk on untrusted files'],
+'options:::options':[':options','  2 moving around, searching and patterns\n      wrapscan  on\n      …','a browsable, editable list of every option'],
+'map:::noremap':[':noremap Y y$','«works in Normal, Visual and Operator-pending»','one command for three modes — be sure you want all three'],
+'map:::map':[':map x dd  then  :map d x','«infinite loop / surprises»','recursive mappings bite; use :noremap'],
+'map:::nnoremap <leader>w :w<CR>':['Space then w','«"main.py" 42L, 980B written»','the first mapping most people add'],
+'map:::nnoremap <leader>n :noh<CR>':['«foo» bar «foo»  (highlight stuck on)','foo bar foo','clears search highlighting on demand'],
+'map:::nnoremap <silent> …':[':nnoremap <leader>w :w<CR>  → echoes the command',':nnoremap <silent> …  «nothing echoed»','keeps the command line quiet'],
+'map:::nnoremap <expr> …':[':nnoremap <expr> j v:count ? \'j\' : \'gj\'','«j moves by screen line, unless you give a count»','the right-hand side is evaluated each time'],
+'map:::unmap / :nunmap':['(a mapping you regret)','«gone for this session»','remove the line from your vimrc for a permanent fix'],
+'map:::map  (no args)':[':nmap','n  <Space>w    * :w<CR>\nn  <Space>n    * :noh<CR>','every mapping currently active'],
+'map:::verbose nmap <leader>w':[':verbose nmap <leader>w','n  <Space>w  * :w<CR>\n      Last set from ~/.vimrc line 42','which file defined this, and where'],
+'map:::iabbrev teh the':['-- INSERT --  teh ‸','-- INSERT --  «the» ','fires when you type a space or punctuation after it'],
+'map:::iabbrev @@ me@example.com':['-- INSERT --  @@ ','-- INSERT --  «me@example.com» ','boilerplate expansion for anything you retype'],
+'map:::cnoremap w!! w !sudo tee > /dev/null %':[':w!!','«"/etc/hosts" written»','the sudo-save trick, as a mapping'],
+'map:::onoremap …':[':onoremap p i(','«dp now deletes inside parentheses»','invent your own text objects'],
+'autocmd:::autocmd BufWritePre * %s/\\s\\+$//e':['let x = 42;····\ndone··','let x = 42;\ndone','cleaned on every save, invisibly'],
+'autocmd:::autocmd FileType python setlocal ts=4 sw=4':['.py → 2-space indent, .js → 4','«each language gets its own settings»','setlocal keeps it to that buffer'],
+'autocmd:::autocmd BufRead,BufNewFile *.conf set ft=conf':['myapp.conf  (no highlighting)','«myapp.conf — highlighted as a config file»','teach Vim about your own extensions'],
+'autocmd:::autocmd BufWritePost .vimrc source %':['edit vimrc, save, restart Vim','«saved — the change is already live»','tighten the config feedback loop'],
+'autocmd:::autocmd VimEnter * …':['(Vim starts)','«your startup command runs»','e.g. opening a file tree'],
+'autocmd:::autocmd InsertLeave * set nopaste':[':set paste left on by accident','«cleared the moment you leave insert»','stops paste mode silently breaking mappings'],
+'autocmd:::augroup mygroup / autocmd! / augroup END':['sourcing vimrc twice → the autocmd runs twice','«autocmd! clears the group first — always once»','wrap every autocmd in a group'],
+'autocmd:::autocmd  (no args)':[':autocmd','--- Autocommands ---\nfiletypedetect  BufRead\n    *.conf    set ft=conf','everything currently registered'],
+'autocmd:::doautocmd FileType':['(settings did not apply)',':doautocmd FileType  «fires them now»','useful after changing filetype rules'],
+'autocmd:::set eventignore=all':['(an autocmd fighting your batch edit)','«autocommands suspended»','set it back to empty afterwards'],
+'netrw:::Ex  /  :Explore':['editing main.py','" ============\n../\nsrc/\ntests/\nREADME.md\nmain.py','the file browser Vim already ships with'],
+'netrw:::Sex / :Vex / :Tex':[':Vex','┌─────┬─────────┐\n│ src/│ main.py │\n│ doc/│         │\n└─────┴─────────┘','the browser in a split or its own tab'],
+'netrw:::Lex 30':[':Lex 30','┌────────┬────────┐\n│ tree   │  code  │\n│ 30 cols│        │\n└────────┴────────┘','a project drawer without installing anything'],
+'netrw::-':['browsing src/app/','«browsing src/»','- goes up a directory'],
+'netrw::<CR>  /  o  /  v  /  t':['cursor on main.py','<CR> here · o split · v vsplit · t new tab','four ways to open the entry under the cursor'],
+'netrw::%  /  d':['(in netrw)','% «new file» · d «new directory»','create without leaving Vim'],
+'netrw::D  /  R':['cursor on old_notes.md','D «deletes it» · R «renames it»','file management from the browser'],
+'netrw::i':['thin listing','«long listing with sizes and dates»','press i again to cycle: thin, long, wide, tree'],
+'netrw::s / r':['sorted by name','«sorted by time»  ·  r reverses it','s cycles name / time / size'],
+'netrw::gh':['src/  main.py','«.git/  .env  src/  main.py»','toggle the dotfiles'],
+'netrw::mf / mx':['mark a.py and b.py with mf','mx → «Enter command: chmod +x»','run a shell command on the marked files'],
+'netrw:::e scp://host//path/file':[':e scp://web01//etc/nginx/nginx.conf','«the remote file, in a normal Vim buffer»',':w sends it back over ssh'],
+'netrw:::e sftp://host/file  /  dav:// ftp://':[':e sftp://host/app.conf','«edited in place over sftp»','netrw speaks several protocols'],
+'netrw:::e file.tar.gz':[':e release.tar.gz','tar.vim\n  app/\n  app/main.py\n  README','press <CR> on a member to edit it inside the archive'],
+'netrw:::e file.zip':[':e bundle.zip','zip.vim\n  index.html\n  style.css','same for zip files'],
+'netrw:::e file.gz':[':e app.log.gz','«the decompressed log»','and :w recompresses it on the way out'],
+'netrw:::Ntree / :NetrwSettings':[':NetrwSettings','g:netrw_banner = 1\ng:netrw_liststyle = 0\n…','every netrw option, in one editable list'],
+'spell:::set spell  /  :set nospell':['recieve the paramter','«recieve» the «paramter»','built in; no plugin required'],
+'spell:::set spelllang=en_us,de':['English and German in one file','«both languages accepted»','comma-separated, in priority order'],
+'spell::]s / [s':['recieve the ‸paramter here','recieve the paramter here  (cursor on the next error)','walk between mistakes'],
+'spell::z=':['cursor on «recieve»','Change "recieve" to:\n 1 "receive"\n 2 "relieve"','pick a number, or Esc to leave it'],
+'spell::1z=':['cursor on «recieve»','«receive»','takes the top suggestion without asking'],
+'spell::zg / zw':['«kubectl» marked wrong','kubectl  (accepted for good)','zw does the opposite: mark a word as wrong'],
+'spell::zug / zuw':['(you added a word by mistake)','«the entry is removed again»','undo for zg and zw'],
+'spell:::set spellfile=~/.vim/spell/en.utf-8.add':['zg on a project word','«appended to that file»','commit the file and the whole team shares the vocabulary'],
+'spell:::set spellsuggest=best,10':['z= shows 40 suggestions','«the ten best ones»','shorter list, better ranked'],
+'spell::<C-x><C-s>':['-- INSERT --  recieve‸','-- INSERT --  «receive»','fix spelling without leaving insert mode'],
+'session:::mksession ~/work.vim':['(6 files, 3 tabs, splits arranged)','«all of it saved to work.vim»','windows, tabs, buffers, working directory and folds'],
+'session:::mksession! ~/work.vim':['E189: "work.vim" exists','«overwritten»','the ! you need when re-saving a session'],
+'session::vim -S ~/work.vim':['$ vim -S ~/work.vim','«your 6 files, 3 tabs and splits, exactly as you left them»','the fastest way back into a project'],
+'session:::source ~/work.vim':['(already in Vim)','«the session is restored in place»','same as -S, without restarting'],
+'session:::set sessionoptions=buffers,curdir,folds,tabpages,winsize':['sessions restoring stale options and mappings','«only what you listed is saved»','drop "options" to avoid surprises'],
+'session:::mkview  /  :loadview':['(folds and cursor position in one file)','«restored on your next visit»','per-file, unlike a session'],
+'session:::set viewoptions=folds,cursor':['views restoring unwanted local options','«just folds and the cursor»','keeps :mkview predictable'],
+'session:::rviminfo / :wviminfo':['(two Vim instances, separate registers)',':wviminfo in one, :rviminfo in the other  «registers shared»','move marks, registers and history between instances'],
+'session:::set viminfo=\'1000,<50,s10,h':['marks remembered for 100 files','«marks remembered for 1000 files»','<50 caps register size; h skips restoring hlsearch'],
+'session:::scriptnames':[':scriptnames','  1: /usr/share/vim/vimrc\n  2: ~/.vimrc\n  3: ~/.vim/plugin/foo.vim','everything Vim loaded, in load order'],
+'vimscript:::let x = 5  /  :let s:name = \'x\'':[':let s:count = 0','«script-local variable»','s: script · g: global · b: buffer · w: window · l: function-local'],
+'vimscript:::echo expr  /  :echom expr':[':echo 6*7',':echo → «42» (vanishes) · :echom → «42» (kept in :messages)','use :echom when debugging autocmds'],
+'vimscript:::messages':[':messages','"main.py" 42L, 980B written\nE486: Pattern not found: foo','the message you just missed'],
+'vimscript:::let &opt = value':[':let &textwidth = 80 - 10','«textwidth=70»','set an option from an expression'],
+'vimscript:::let &l:opt / :setlocal':[':setlocal shiftwidth=2','«this buffer only»','the global value is untouched'],
+'vimscript:::function! Name(a, b) … endfunction':[':function! Add(a, b)\n  return a:a + a:b\nendfunction','«Add() is now defined»','the ! lets you re-source the file without an error'],
+'vimscript:::call Name(1, 2)':[':call Add(1, 2)','«3» (discarded — use :echo to see it)',':call runs a function as a statement'],
+'vimscript:::return a:a + a:b':[':echo Add(2, 3)','«5»','a: is how you reach the arguments'],
+'vimscript:::if … elseif … else … endif':[':if has("unix") | set shell=zsh | endif','«applies only on Unix»','the backbone of a portable vimrc'],
+'vimscript:::for i in range(10) … endfor':[':for i in range(3) | echo i | endfor','0\n1\n2','loops over lists, ranges and dictionary keys'],
+'vimscript:::while cond … endwhile':[':let i = 0\n:while i < 3 | let i += 1 | endwhile','«i is now 3»','rarer than :for, but it exists'],
+'vimscript:::execute \'normal! \' . cmd':[':execute "normal! " . count . "dd"','«deletes that many lines»','build a command from strings at run time'],
+'vimscript:::normal! gg=G':[':normal! gg=G','«whole file re-indented»','the ! suffix ignores user mappings and should always be used'],
+'vimscript:::silent! cmd':[':silent! %s/foo/bar/g','«no error if nothing matched»','silent hides output, ! swallows errors'],
+'vimscript::expand(\'%:p\')  /  fnamemodify()':[':echo expand("%:p")','/home/you/proj/src/main.py','fnamemodify() does the same to any string'],
+'vimscript::getline(1,\'$\')  /  setline()':[':echo len(getline(1,"$"))','«240»  (lines in the buffer)','read and write buffer lines from a script'],
+'vimscript::system(\'ls\')  /  systemlist()':[':echo systemlist("git branch --show-current")','[\'main\']','systemlist() gives you a list, one line per item'],
+'vimscript::has(\'unix\')  /  executable(\'rg\')':[':if executable("rg") | set grepprg=rg\\ --vimgrep | endif','«ripgrep used when installed, grep otherwise»','how a vimrc stays portable'],
+'vimscript:::source file.vim  /  :runtime':[':source ~/.vimrc','«config reloaded»',':runtime searches the whole runtimepath'],
+'vimscript:::command! Name cmd':[':command! Reload source $MYVIMRC','«:Reload now exists»','user commands must start with a capital'],
+'vimscript:::debug cmd  /  :breakadd':[':debug call MyFunc()','cmd: call MyFunc()\n>  (n)ext (s)tep (c)ont (q)uit','a real step debugger for Vimscript'],
+'vimscript:::profile start log | :profile func *':[':profile start /tmp/p.log','FUNCTION  MyPlugin#slow()\n  Called 1 time, total 1.204s','finds the plugin that makes startup slow'],
+'vimscript:::verbose function Foo':[':verbose function Add','function Add(a, b)\n    Last set from ~/.vimrc line 88','shows the body and where it came from'],
+'cmdline::<C-r><C-a>':['cursor on ./sr‸c/main.py',':e «./src/main.py»','the WORD under the cursor, punctuation included'],
+'cmdline::<C-r><C-f>':['cursor on a file name in the text',':e «that file name»','recognises file names specifically'],
+'cmdline::<C-r>{reg}':[':%s/‸',':%s/«contents of the register»','<C-r>/ inserts the last search, <C-r>0 the last yank'],
+'cmdline::<C-r>=expand(\'%:h\')<CR>':[':e ‸',':e «src/app»/','insert the current file\'s directory and keep typing'],
+'cmdline::<C-p> / <C-n>':[':e src/ma  then <C-p>',':«the previous command, whatever it was»','unfiltered history, unlike <Up>'],
+'cmdline::<C-v>{key}':[':nnoremap <C-v><Tab>',':nnoremap «<Tab>»','insert a key literally when writing mappings'],
+'cmdline:::history':[':history','#  cmd history\n1  w\n2  %s/foo/bar/g\n3  e src/main.py',':history / shows search history instead'],
+'cmdline:::cmd | cmd':[':g/foo/d | w','«the | is swallowed by :g»',':normal, :g and :s eat the rest of the line — put them last'],
+'sysadmin::vim -u NONE -N -c \'set nu\'':['$ vim -u NONE -N -c \'set nu\' file','«bare Vim, but with line numbers»','-c runs any command after startup'],
+'sysadmin:::%!xxd -r':['00000000: 7f45 4c46  .ELF','«the binary again»','convert back before writing, or the hex dump is saved as the file contents'],
+'sysadmin:::set noeol binary':['Vim adds a trailing newline on write','«the file is written byte for byte»','essential when patching binaries or firmware'],
+'sysadmin::vim -M':['vim -R still lets you :set noreadonly','vim -M «refuses all changes»','the strongest read-only'],
+'sysadmin::vim scp://host//etc/nginx/nginx.conf':['$ vim scp://web01//etc/nginx/nginx.conf','«the remote file, edited locally, saved back over ssh»','your local vimrc and plugins still apply'],
+'sysadmin:::e ++ff=dos file':['every line ending in ^M','«clean lines»','then :set ff=unix and :w to convert'],
+'sysadmin:::set nowrap | :set sidescroll=1':['one 4000-character log line wrapping over the screen','«one line, scrolled smoothly sideways»','makes wide logs readable'],
+'sysadmin:::set syntax=off | :set noundofile':['a 2 GB log, every keypress lagging','«responsive again»','syntax highlighting is what usually costs you'],
+'sysadmin::vim -c \'set bt=nofile\' -':['$ journalctl -u nginx | vim -c \'set bt=nofile\' -','«the output in a scratch buffer Vim will not try to save»','no accidental writes'],
+'sysadmin:::recover file  /  vim -r file':['E325: ATTENTION — swap file found','«your unsaved work, recovered»','then :w to a new name and delete the .swp'],
+'sysadmin:::set readonly! ':['(read-only, and you need one edit)','«writable»','a deliberate switch, not an accident'],
+'sysadmin:::earlier 1f':['(a botched editing session)','«the file exactly as it was at the last write»','more reliable than repeated u when the change count is unknown'],
+'sysadmin::vim -c \'g/ERROR/p\' -c \'q\' log.txt':['$ vim -c \'g/ERROR/p\' -c \'q\' log.txt','ERROR disk full\nERROR timeout','Vim as a one-shot filter in a shell pipeline'],
+'gems::<C-a> on 0x1f / 007':['mask = 0x1‸f','mask = «0x20»','and 007 becomes 010 in octal — set nrformats to control it'],
+'gems::gJ in a macro':['"line one"\n"line two"','"line one"«»"line two"','J would insert a space; gJ joins them exactly'],
+'gems:::%!tac  /  :g/^/m0':['a\nb\nc','c\nb\na','two ways to reverse a file; :g/^/m0 needs no shell'],
+'gems:::sort!  /  :sort n  /  :sort u':['item 10\nitem 9\nitem 9',':sort n u → item 9\n           item 10','flags combine: n numeric, u unique, ! reversed'],
+'gems::g<C-g>':['(the file, or a selection)','Col 12  Word 340 of 2,140  Line 42 of 310','a built-in word count'],
+'gems::ga / g8':['the character ‸é','ga → <é> 233, Hex 00e9\ng8 → c3 a9','identify any character and its bytes'],
+'gems::<C-k> digraphs':['-- INSERT --  ‸','<C-k>-> «→» · <C-k>Eu «€» · <C-k>12 «½» · <C-k>a: «ä»','full list available with :digraphs'],
+'gems:::set virtualedit=all':['    ┌───┐\n(cursor cannot go past the text)','    ┌───┐\n    «cursor anywhere on the grid»','required for drawing or editing ASCII diagrams'],
+'gems::<C-v> then $ then A':['a = 1\nbb = 22\nccc = 333','a = 1«;»\nbb = 22«;»\nccc = 333«;»','$ handles the ragged ends; A appends to each'],
+'gems:::set scrollbind':['two windows drifting apart','«both scroll in lockstep»','run :set scrollbind in each window'],
+'gems::zf then zj/zk':['a 2000-line file you did not write','«+-- 200 lines»\n«+-- 340 lines»','fold it into an outline, then walk the folds'],
+'gems::gv after p':['(pasted over a selection, want to do it again)','gv «reselects» — then p again','p clobbers the register, so use "0p or yank again'],
+'gems:::earlier 30s':['(last 30 seconds went wrong)','«the file as it was half a minute ago»','s seconds · m minutes · h hours · d days'],
+'gems::q: then edit then <CR>':[':%s/verylongpattern/replacement/gc  (one typo)','«a Vim buffer of your history — fix the line, press <CR>»','the command line with full editing'],
+'gems::<C-o> / <C-i> across files':['main.py → util.py → db.py‸','main.py → ‸util.py → db.py','one back button for the whole session'],
+'gems:::Man printf  /  K':[':Man printf','PRINTF(3)  Linux Programmer\'s Manual','add :runtime ftplugin/man.vim to your vimrc'],
+'gems:::help quickref':[':help quickref','N  %       find the next brace, bracket, comment…\nN  f{char} cursor to Nth occurrence of {char}…','one screenful covering most of Vim'],
+'options:::set termguicolors':['256-colour approximation of your theme','«the exact colours the theme author chose»','needs a terminal that supports true colour'],
+'options:::set background=dark':['comments barely visible on your background','«the colourscheme picks its dark variant»','set it before :colorscheme']
+};
+
+
+const TIERS = [
+  {id:'essential', title:'Essential', icon:'', note:'Approximately one hundred commands that account for most routine editing. Recommended before the rest.'},
+  {id:'daily',     title:'Daily use', icon:'', note:'Commands that repay learning once the essentials are automatic.'},
+  {id:'rare',      title:'Rare',      icon:'', note:'The long tail: intended for lookup rather than memorisation.'}
+];
+
+const ITEMS = [];
+SECTIONS.forEach(s => s.items.forEach(it => ITEMS.push({
+  sec:s.id, cat:s.title.split(' — ')[0].split(' (')[0], key:it[0], desc:it[1], tier:it[2], doc:it[3],
+  demo:DEMOS[s.id + '::' + it[0]] || null,
+  kl:it[0].toLowerCase(), dl:it[1].toLowerCase(), sl:s.title.toLowerCase()
+})));
+const TOTAL = ITEMS.length;
+
+const docURL = d => {
+  const i = d.indexOf('#');
+  return 'https://vimhelp.org/' + (i < 0 ? d : d.slice(0, i)) + '.html' +
+         (i < 0 ? '' : '#' + encodeURIComponent(d.slice(i + 1)));
+};
+const docTag = d => { const i = d.indexOf('#'); return i < 0 ? d : d.slice(i + 1); };
+
+const out = document.getElementById('out'), countEl = document.getElementById('count'), q = document.getElementById('q');
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hl = (raw, term) => {
+  if (!term) return esc(raw);
+  const i = raw.toLowerCase().indexOf(term);
+  return i < 0 ? esc(raw)
+    : esc(raw.slice(0,i)) + '<mark>' + esc(raw.slice(i,i+term.length)) + '</mark>' + esc(raw.slice(i+term.length));
+};
+/* ‸ = cursor, «…» = affected text */
+const demoLine = raw => esc(raw)
+  .replace(/«/g,'\u0001').replace(/»/g,'\u0002')
+  .replace(/\u0001([^\u0002]*)\u0002/g,'<mark>$1</mark>')
+  .replace(/[\u0001\u0002]/g,'')
+  .replace(/‸/g,'<span class="cur"></span>');
+
+let mode = 'function', collapsed = false;
+try { mode = localStorage.getItem('vfg-group') || 'function'; } catch(e) {}
+
+const groups = () => mode === 'function'
+  ? SECTIONS.map(s => ({id:s.id, title:s.title, icon:s.icon, note:s.note, items:ITEMS.filter(i => i.sec === s.id)}))
+  : TIERS.map(t => ({id:t.id, title:t.title, icon:t.icon, note:t.note, items:ITEMS.filter(i => i.tier === t.id)}));
+
+const COLW = 520, GAP = 18;
+let blocks = [], lastK = 0;
+
+function layout(force) {
+  const K = Math.max(1, Math.floor((out.clientWidth + GAP) / (COLW + GAP)));
+  if (!force && K === lastK && out.children.length) return;
+  lastK = K;
+  out.style.gridTemplateColumns = 'repeat(' + K + ',minmax(0,1fr))';
+  out.innerHTML = '';
+  if (!blocks.length) { out.innerHTML = emptyHTML; out.style.gridTemplateColumns = '1fr'; return; }
+  const cols = [];
+  for (let i = 0; i < K; i++) {
+    const d = document.createElement('div');
+    d.className = 'col';
+    out.appendChild(d);
+    cols.push(d);
+  }
+  // place each group whole, into whichever column is currently shortest
+  blocks.forEach(html => {
+    let min = 0;
+    for (let i = 1; i < K; i++) if (cols[i].offsetHeight < cols[min].offsetHeight) min = i;
+    cols[min].insertAdjacentHTML('beforeend', html);
+  });
+}
+
+let emptyHTML = '';
+
+function render() {
+  const term = q.value.trim().toLowerCase();
+  let shown = 0;
+  blocks = [];
+  groups().forEach(g => {
+    const hits = g.items.filter(i => !term || i.kl.includes(term) || i.dl.includes(term) ||
+                                     g.title.toLowerCase().includes(term) || i.sl.includes(term));
+    if (!hits.length) return;
+    shown += hits.length;
+    blocks.push('<section id="' + g.id + '"' + ((collapsed && !term) ? ' class="closed"' : '') + '>' +
+      '<div class="sh"><h2>' + esc(g.title) + '</h2>' +
+      '<span class="n">' + hits.length + '</span><span class="caret">▼</span></div><div class="body">' +
+      (g.note ? '<div class="note">' + esc(g.note) + '</div>' : '') +
+      hits.map(i =>
+        '<div class="row' + (i.demo ? ' hasdemo' : '') + '" data-id="' + ITEMS.indexOf(i) + '">' +
+        '<span class="k' + (i.key.length > 17 ? ' long' : '') + '">' + hl(i.key, term) + '</span>' +
+        '<span class="d"><span>' + hl(i.desc, term) + '</span>' +
+        (mode === 'frequency' ? '<i class="cat">' + esc(i.cat) + '</i>' : '') + '</span>' +
+        (i.demo ? '<i class="pin" title="Show the example below this row">▸</i>' : '') +
+        '<a class="doc" href="' + docURL(i.doc) + '" target="_blank" rel="noopener"' +
+        ' title="Documentation: :help ' + esc(docTag(i.doc)) + '">?</a></div>' +
+        (i.demo ? inlineDemo(i) : '')).join('') +
+      '</div></section>');
+  });
+  emptyHTML = '<div class="empty">No results for “' + esc(q.value) +
+    '”. Try a broader term, for example <em>split</em>, <em>register</em>, <em>fold</em>, ' +
+    '<em>quickfix</em>, <em>macro</em> or <em>indent</em>.</div>';
+  countEl.textContent = term ? shown + ' of ' + TOTAL : TOTAL + ' commands';
+  layout(true);
+}
+
+let rt = null;
+addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => layout(false), 140); });
+
+function inlineDemo(i) {
+  const [before, after, cap] = i.demo;
+  return '<div class="idemo"><div class="pair"><pre>' + demoLine(before) + '</pre>' +
+    (after ? '<span class="ar">▸</span><pre>' + demoLine(after) + '</pre>' : '') + '</div>' +
+    (cap ? '<div class="cap">' + esc(cap) + '</div>' : '') + '</div>';
+}
+
+/* ---------- demo card ---------- */
+const card = document.getElementById('dcard');
+let hideT = null, showT = null;
+function showCard(row) {
+  const it = ITEMS[+row.dataset.id];
+  if (!it || !it.demo || row.classList.contains('open')) return;
+  const [before, after, cap] = it.demo;
+  card.innerHTML = '<div class="dk">' + esc(it.key) +
+    '<small>:help ' + esc(docTag(it.doc)) + '</small></div>' +
+    '<div class="pane"><span class="tag">Before</span><pre>' + demoLine(before) + '</pre></div>' +
+    (after ? '<div class="arrow">▼</div><div class="pane"><span class="tag">After</span><pre>' +
+             demoLine(after) + '</pre></div>' : '') +
+    (cap ? '<div class="cap">' + esc(cap) + '</div>' : '');
+  card.classList.add('on');
+  const r = row.getBoundingClientRect(), cw = card.offsetWidth, ch = card.offsetHeight;
+  let left = r.right + 14;
+  if (left + cw > innerWidth - 10) left = r.left - cw - 14;
+  if (left < 10) left = Math.max(10, Math.min(r.left, innerWidth - cw - 10));
+  let top = r.top - 8;
+  if (top + ch > innerHeight - 10) top = innerHeight - ch - 10;
+  card.style.left = left + 'px';
+  card.style.top = Math.max(10, top) + 'px';
+}
+const hideCard = () => card.classList.remove('on');
+
+out.addEventListener('mouseover', e => {
+  const row = e.target.closest('.row');
+  if (!row || !row.classList.contains('hasdemo')) { clearTimeout(showT); hideT = setTimeout(hideCard, 90); return; }
+  clearTimeout(hideT); clearTimeout(showT);
+  showT = setTimeout(() => showCard(row), 110);
+});
+out.addEventListener('mouseleave', () => { clearTimeout(showT); hideCard(); });
+addEventListener('scroll', hideCard, {passive:true});
+
+/* ---------- click: copy (and show demo on touch) ---------- */
+out.addEventListener('click', e => {
+  if (e.target.closest('.doc')) return;          // let the help link open
+  const sh = e.target.closest('.sh');
+  if (sh) { sh.parentElement.classList.toggle('closed'); hideCard(); return; }
+  const row = e.target.closest('.row');
+  if (!row || !row.classList.contains('hasdemo')) return;
+  row.classList.toggle('open');                  // click reveals the demo under the row
+  hideCard();
+});
+document.body.addEventListener('click', e => { if (!e.target.closest('.row')) hideCard(); });
+
+/* ---------- controls ---------- */
+q.addEventListener('input', () => { hideCard(); render(); });
+
+const gf = document.getElementById('gf'), gt = document.getElementById('gt');
+const expandT = document.getElementById('expand-t');
+function setMode(m) {
+  mode = m; collapsed = false; expandT.textContent = 'collapse all';
+  gf.setAttribute('aria-pressed', m === 'function');
+  gt.setAttribute('aria-pressed', m === 'frequency');
+  try { localStorage.setItem('vfg-group', m); } catch(e) {}
+  render();
+}
+gf.onclick = () => setMode('function');
+gt.onclick = () => setMode('frequency');
+
+document.getElementById('expand').onclick = () => {
+  collapsed = !collapsed;
+  expandT.textContent = collapsed ? 'expand all' : 'collapse all';
+  hideCard();
+  render();               // rebuild so the fold state survives re-balancing
+};
+
+const root = document.documentElement;
+try { const t = localStorage.getItem('vfg-theme'); if (t) root.dataset.theme = t; } catch(e) {}
+document.getElementById('theme').onclick = () => {
+  root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+  try { localStorage.setItem('vfg-theme', root.dataset.theme); } catch(e) {}
+};
+
+addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); q.select(); }
+  if (e.key === 'Escape') { hideCard(); if (document.activeElement === q) { q.value=''; render(); q.blur(); } }
+});
+
+const topBtn = document.getElementById('top-btn');
+addEventListener('scroll', () => topBtn.classList.toggle('show', scrollY > 700), {passive:true});
+topBtn.onclick = () => scrollTo({top:0, behavior:'smooth'});
+
+setMode(mode);
+</script>
+</body>
+</html>
