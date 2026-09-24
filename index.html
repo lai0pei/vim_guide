@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0f1115">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%230f1115'/%3E%3Cpath d='M10 12 L20 29 L30 12' fill='none' stroke='%2357c96a' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='27' y='24' width='5' height='7' fill='%2357c96a'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%230f1115'/%3E%3Cpath d='M10 12 L20 29 L30 12' fill='none' stroke='%2357c96a' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='27' y='24' width='5' height='7' fill='%2357c96a'/%3E%3C/svg%3E">
-<meta name="description" content="A searchable reference to 606 Vim commands, compiled from the official help files, with before/after examples and links to the documentation.">
+<meta name="description" content="A searchable reference to 633 Vim commands, compiled from the official help files, with before/after examples and links to the documentation.">
 <style>
 :root{
   --bg:#0f1115; --bg2:#151922; --bg3:#1b202b; --line:#252c3a;
@@ -279,6 +279,9 @@ const SECTIONS = [
 ['i[ i]  /  a[ a]','Inside / around square brackets','daily','motion.txt#v_i['],
 ['i< i>  /  a< a>','Inside / around angle brackets','rare','motion.txt#v_i<'],
 ['it / at','Inside / around an XML/HTML tag pair','daily','motion.txt#v_it'],
+['ciw / caw','Change the word under the cursor (the everyday rename)','essential','motion.txt#v_iw'],
+['diw / daw','Delete inner word / a word plus its trailing space','essential','motion.txt#v_iw'],
+['yiw','Yank the whole word the cursor sits on','daily','motion.txt#v_iw'],
 ['ci"','Change the text inside the quotes','essential','motion.txt#v_iquote'],
 ['di(','Delete inside the parens, keep the parens','essential','motion.txt#v_ib'],
 ['ya{','Yank the whole brace block including braces','rare','motion.txt#v_aB'],
@@ -326,7 +329,9 @@ const SECTIONS = [
 ['xp','Transpose two characters','rare','change.txt#x'],
 ['yiwviwp','Replace a word with the yanked word (clobbers register)','rare','change.txt#v_p'],
 ['"0p','Paste the last yank even after you deleted something','daily','change.txt#quote0'],
+['cgn','Change the next search match; then . repeats it match after match','daily','visual.txt#gn'],
 ['&  /  g&','Repeat last :s on this line / on the whole file','daily','change.txt#&'],
+[':&&','Repeat the last :s keeping its flags (over any range)','daily','change.txt#:&&'],
 ['ga','Show the character code under the cursor (dec/hex/octal)','rare','various.txt#ga'],
 ['g8','Show the UTF-8 bytes of the character under the cursor','rare','various.txt#g8'],
 ['gv','Reselect the last visual selection','essential','visual.txt#gv'],
@@ -362,6 +367,7 @@ const SECTIONS = [
 {id:'search',title:'Search & Replace',icon:'⌕',note:'Vim patterns. \\v (very magic) gives a syntax close to Perl and PCRE.',items:[
 ['/pattern  ?pattern','Search forward / backward','essential','pattern.txt#/'],
 ['n / N','Next / previous match (same / opposite direction)','essential','pattern.txt#n'],
+['gd / gD','Jump to the local / global declaration of the word under the cursor','daily','pattern.txt#gd'],
 ['/pat/e','Put the cursor at the end of the match','rare','pattern.txt#search-offset'],
 ['/pat/+2','Land 2 lines below the match','rare','pattern.txt#search-offset'],
 ['//','Repeat the previous search','daily','pattern.txt#last-pattern'],
@@ -374,6 +380,7 @@ const SECTIONS = [
 ['\\<word\\>','Whole-word match','daily','pattern.txt#/\\<'],
 ['\\zs / \\ze','Set where the match actually starts / ends','rare','pattern.txt#/\\zs'],
 ['\\{n,m}','Repeat n to m times','daily','pattern.txt#/\\{'],
+['\\{-}','Non-greedy: match as few characters as possible','daily','pattern.txt#/\\{-'],
 ['\\(...\\)  →  \\1','Capture group and backreference','daily','pattern.txt#/\\('],
 ['%(...)','Non-capturing group (with \\v)','rare','pattern.txt#/\\%(\\)'],
 ['\\_s / \\_.','Whitespace / any char, including newlines','rare','pattern.txt#/\\_'],
@@ -764,12 +771,35 @@ const SECTIONS = [
 ['s / r','Change the sort order / reverse it','rare','pi_netrw.txt#netrw-s'],
 ['gh','Toggle hidden (dotfile) display','rare','pi_netrw.txt#netrw-gh'],
 ['mf / mx','Mark files / run a shell command on the marked files','rare','pi_netrw.txt#netrw-mf'],
+['mt / mc / mm','Set a target directory, then copy / move the marked files to it','rare','pi_netrw.txt#netrw-mt'],
+['mb / gb','Bookmark the current directory / jump back to a bookmark','rare','pi_netrw.txt#netrw-mb'],
+['p','Preview the file in a split without leaving the browser','rare','pi_netrw.txt#netrw-p'],
+['x','Open the entry with the system handler (xdg-open / open)','rare','pi_netrw.txt#netrw-x'],
+['u / U','Go back / forward through the directories you have visited','rare','pi_netrw.txt#netrw-u'],
+['c','Make the browsed directory Vim\'s working directory','rare','pi_netrw.txt#netrw-c'],
 [':e scp://host//path/file','Edit a file on a remote machine over SSH','daily','pi_netrw.txt#netrw-transparent'],
 [':e sftp://host/file  /  dav:// ftp://','Other remote protocols netrw understands','rare','pi_netrw.txt#netrw-externapp'],
 [':e file.tar.gz','Browse inside an archive and edit files in place','daily','pi_tar.txt#tar'],
 [':e file.zip','The same for zip files','daily','pi_zip.txt#zip'],
 [':e file.gz','Gzipped files are decompressed transparently','rare','pi_gzip.txt#gzip'],
 [':Ntree / :NetrwSettings','Set the tree root / show netrw\'s options','rare','pi_netrw.txt#netrw-settings']
+]},
+
+{id:'plugins',title:'Bundled Plugins & Packages',icon:'🧩',note:'Optional features that already ship with Vim — no download needed. Load one with :packadd; drop your own into ~/.vim/pack/*/start to autoload it.',items:[
+['~/.vim/pack/x/start/','Native package dir (Vim 8+): anything here loads at startup, no plugin manager','daily','repeat.txt#packages'],
+[':packadd {name}','Load an optional package that ships with Vim on demand','daily','repeat.txt#:packadd'],
+[':scriptnames','List every script and plugin Vim has loaded, in load order','rare','repeat.txt#:scriptnames'],
+[':packadd! matchit','matchit: make % also jump between if/else/endif, tags and keywords (on by default via defaults.vim)','daily','usr_05.txt#matchit-install'],
+['[% / ]%','matchit: jump to the start / end of the current unmatched block','rare','matchit.txt#[%'],
+['g%','matchit: cycle backwards through the members of a matching group','rare','matchit.txt#g%'],
+[':DoMatchParen / :NoMatchParen','matchparen: turn the automatic matching-bracket highlight on / off','rare','pi_paren.txt#matchparen'],
+['gc{motion} / gcc','comment plugin: comment or uncomment using \'commentstring\' (Vim 9.1+)','daily','comment.txt#gc'],
+[':TOhtml','Convert the buffer, syntax colours and all, into a standalone HTML file','daily','syntax.txt#:TOhtml'],
+[':packadd termdebug  →  :Termdebug','Debug a program with gdb in a split, inside Vim','rare','terminal.txt#terminal-debug'],
+[':Break / :Step / :Over / :Continue','termdebug: the usual gdb controls as Ex commands','rare','terminal.txt#:Termdebug'],
+[':packadd cfilter  →  :Cfilter /pat/','Keep only quickfix entries matching a pattern (:Lfilter for the location list)','rare','quickfix.txt#:Cfilter'],
+['.editorconfig','Honoured automatically: indent, charset and EOL from the project file (Vim 9.0.1799+)','daily','editorconfig.txt'],
+[':helptags {dir}','Rebuild a plugin\'s help tags so :help can find its docs','rare','helphelp.txt#:helptags']
 ]},
 
 {id:'spell',title:'Spelling',icon:'✓',note:'Spell checking, navigation between misspellings, and managing the word list.',items:[
@@ -1497,7 +1527,39 @@ const DEMOS = {
 'gems:::Man printf  /  K':[':Man printf','PRINTF(3)  Linux Programmer\'s Manual','add :runtime ftplugin/man.vim to your vimrc'],
 'gems:::help quickref':[':help quickref','N  %       find the next brace, bracket, comment…\nN  f{char} cursor to Nth occurrence of {char}…','one screenful covering most of Vim'],
 'options:::set termguicolors':['256-colour approximation of your theme','«the exact colours the theme author chose»','needs a terminal that supports true colour'],
-'options:::set background=dark':['comments barely visible on your background','«the colourscheme picks its dark variant»','set it before :colorscheme']
+'options:::set background=dark':['comments barely visible on your background','«the colourscheme picks its dark variant»','set it before :colorscheme'],
+
+'netrw::mt / mc / mm':['src/  ‸utils.js  README.md','«utils.js copied to the target dir»','mt sets a target dir, mf marks files, mc copies them there (mm moves)'],
+'netrw::mb / gb':['~/project/deep/nested/‸dir/','«jumped straight back to a bookmarked dir»','mb bookmarks the current dir; gb returns to it from anywhere'],
+'netrw::p':['notes.md  ‸config.yaml  main.go','config.yaml opens in a preview split, cursor stays in netrw','peek at a file without committing to opening it'],
+'netrw::x':['‸diagram.png','opens in the system image viewer','x hands the entry to xdg-open / open'],
+'netrw::u / U':['(now in src/, was just in tests/)','«back in tests/»','u and U walk backward / forward through your directory history'],
+'netrw::c':['browsing ~/project/src/','«:pwd → ~/project/src»','now :e and :find are relative to what you are browsing'],
+
+'objects::ciw / caw':['const wid‸th = 10','const «height»‸ = 10','ciw replaces just the word; caw also swallows a surrounding space'],
+'objects::diw / daw':['the quick ‸brown fox','the quick ‸fox','daw takes the word and one space; diw would leave the spaces'],
+'objects::yiw':['user_‸name = 1','«user_name» is now in the yank register','grab a whole word to paste or search for elsewhere'],
+
+'edit::cgn':['/foo<CR>  then  cgnBAR<Esc>  then  . . .','every foo becomes BAR, one dot per match','search once, change once, then just tap . down the file'],
+'edit:::&&':[':s/foo/bar/g on line 1, move to line 9, :&&','line 9 gets the same substitution, g flag and all','plain & forgets the flags; :&& keeps them'],
+
+'search::gd / gD':['x = count + 1  …  let ‸count = 0','let ‸count = 0   (cursor on the declaration)','gd jumps to where the identifier under the cursor is declared'],
+'search::\\{-}':['/<.\\{-}>  over  <a><b>','matches «<a>» only, not the whole «<a><b>»','the non-greedy quantifier: stop at the first match'],
+
+'plugins::~/.vim/pack/x/start/':['git clone …/some-plugin ~/.vim/pack/vendor/start/','«loaded automatically on next launch»','Vim 8+ package system — no plugin manager needed'],
+'plugins:::packadd {name}':[':packadd termdebug','«the package is now loaded and ready»','pull an optional plugin from pack/*/opt on demand'],
+'plugins:::scriptnames':['','  1: /usr/share/vim/vimrc\n  2: ~/.vimrc\n  3: …/plugin/matchit.vim','exactly what loaded, in order — for tracking down surprises'],
+'plugins:::packadd! matchit':['if x:\n    ‸pass      (% did nothing here)','% now hops if: → else: → endif','matchit teaches % about language keywords, not just brackets'],
+'plugins::[% / ]%':['<div>\n  ‸<p>hi</p>\n</div>','jumps to the matching </div> boundary','move to the edges of the block you are inside'],
+'plugins::g%':['#if … #elif … ‸#else … #endif','g% steps back to #elif, then #if','cycle the members of a matched group in reverse'],
+'plugins:::DoMatchParen / :NoMatchParen':['foo(bar‸)   ← ( and ) auto-highlighted',':NoMatchParen  →  the highlight turns off','toggle the bracket matching that is on by default'],
+'plugins::gc{motion} / gcc':['let x = 1‸','«// »let x = 1','gcc toggles the line comment; gcap does a whole paragraph'],
+'plugins:::TOhtml':['a syntax-coloured source buffer','a new buffer of self-contained, coloured HTML','share code that looks exactly like your editor'],
+'plugins:::packadd termdebug  →  :Termdebug':[':Termdebug ./a.out','gdb, your source and the program in panes side by side','a full debugger with no third-party plugin'],
+'plugins:::Break / :Step / :Over / :Continue':['cursor on a line, then :Break','breakpoint set; :Continue runs up to it','drive gdb with Ex commands or the toolbar buttons'],
+'plugins:::packadd cfilter  →  :Cfilter /pat/':['250 quickfix hits, most of them in tests/',':Cfilter! /tests/  →  only the real hits remain','trim a huge quickfix list without grepping again'],
+'plugins::.editorconfig':['a repo whose .editorconfig says indent_size = 2','this buffer opens with sw=2 sts=2 expandtab','project style applied with no plugin and no config'],
+'plugins:::helptags {dir}':[':helptags ~/.vim/pack/vendor/start/foo/doc','«:help foo now works»','index a plugin\'s docs so :help can reach them']
 };
 
 

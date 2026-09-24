@@ -1,13 +1,13 @@
 # Vim Field Guide
 
-A single-file, searchable reference to **606 Vim commands in 29 groups**, compiled from the official
+A single-file, searchable reference to **633 Vim commands in 30 groups**, compiled from the official
 Vim help files. Each row reads **command first, description second**, aligned in a left-hand column
 so the page scans like a reference table; search matches both, so commands can also be found by what
 they do.
 
 The page carries its own favicon (an inline SVG — still one file, nothing to upload).
 
-**Every command carries a worked example.** All 606 have a before/after card: a sample line before the
+**Every command carries a worked example.** All 633 have a before/after card: a sample line before the
 command, the same line after, with the affected text highlighted and the cursor position marked.
 
 No build step, no dependencies, no network calls. One `index.html`.
@@ -42,15 +42,15 @@ beneath it, where it stays until clicked again; several may be open at once.
 
 Every row ends with a **?** linking to that exact command on [vimhelp.org](https://vimhelp.org) —
 the official help text, at the right anchor, not a search. The targets were generated from Vim's own
-`tags` file, so all 606 point at a real help tag (the same one `:help <tag>` opens locally). The tag
+`tags` file, so all 633 point at a real help tag (the same one `:help <tag>` opens locally). The tag
 is shown in the hover card, and in the link's tooltip.
 
 ### Two groupings
 
 | Grouping | What it gives you |
 | --- | --- |
-| **by function** (default) | the 29 topic groups — movement, editing, registers, quickfix… ordered most useful first |
-| **by frequency** | **Essential** (103) → **Daily use** (260) → **Rare** (243); each row keeps a tag showing which function group it came from |
+| **by function** (default) | the 30 topic groups — movement, editing, registers, quickfix… ordered most useful first |
+| **by frequency** | **Essential** (105) → **Daily use** (271) → **Rare** (257); each row keeps a tag showing which function group it came from |
 
 *By function* suits lookup; *by frequency* suits working through the material in order.
 
@@ -85,19 +85,19 @@ It goes live at `https://<you>.github.io/vim-field-guide/` within a minute or tw
 10. Files, Buffers & Arguments — 11. Windows & Tabs — 12. Marks & Jumps — 13. Macros —
 14. Undo & Time Travel — 15. Code Navigation (tags, quickfix, grep) — 16. Folding — 17. Diff —
 18. Terminal & Shell — 19. Indent & Format — 20. Options Worth Knowing — 21. Mappings —
-22. Autocommands — 23. File Browsing, Archives & Remote — 24. Spelling — 25. Sessions & Views —
-26. Vimscript Essentials — 27. Command-Line Tricks — 28. Sysadmin & Big-File Survival —
-29. Lesser-Known Gems
+22. Autocommands — 23. File Browsing, Archives & Remote — 24. Bundled Plugins & Packages —
+25. Spelling — 26. Sessions & Views — 27. Vimscript Essentials — 28. Command-Line Tricks —
+29. Sysadmin & Big-File Survival — 30. Lesser-Known Gems
 
 ## Suggested use
 
 Select **by frequency**, take the **Essential** group first, and work through it with the examples
 open. Groups 1–7 of the functional view account for the majority of routine editing; groups 15, 20
-and 28 are the ones that most affect a Linux workflow.
+and 29 are the ones that most affect a Linux workflow.
 
 ## Accuracy
 
-Every entry resolves to a real tag in Vim's own `tags` file — all 606 — so the **?** links land on the
+Every entry resolves to a real tag in Vim's own `tags` file — all 633 — so the **?** links land on the
 correct help section rather than a search page. Sixty entries, chosen as the ones most easily got
 wrong, were then checked line by line against the help text itself: 57 were exact and 4 corrections
 were made (`gm`, `zug`/`zuw`, and the help targets for blockwise `d` and `//`).
